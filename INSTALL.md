@@ -19,7 +19,7 @@ Make sure you have the following installed on your system:
      - `docker compose up -d`
 
 3. **Verify that Geoglify is running**:
-   - Open your browser and navigate to [http://localhost:81](http://localhost:81).
+   - Open your browser and navigate to [http://localhost:81](http://localhost:8081).
 
 ## Usage
 

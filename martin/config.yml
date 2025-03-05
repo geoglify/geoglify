@@ -1,8 +1,0 @@
-keep_alive: 75
-listen_addresses: '0.0.0.0:3000'
-worker_processes: 8
-#cache_size_mb: 0~
-preferred_encoding: gzip
-postgres:
-    connection_string: 'postgresql://dbadmin:geoglify2024@database/geoglify'
-    default_srid: 4326

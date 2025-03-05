@@ -1,4 +1,5 @@
-*/vendor
-*/composer.lock
-*/boostrap/
-*/public/storage
+/vendor
+/composer.lock
+/boostrap/
+/public/storage
+/node_modules

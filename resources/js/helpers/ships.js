@@ -7,6 +7,7 @@ export default {
     // Generates properties for a ship feature
     generateShipProperties(ship) {
         return {
+            id: ship.id, // Ship's ID
             mmsi: ship.mmsi, // Ship's MMSI (Maritime Mobile Service Identity)
             name: ship.name || 'N/A', // Ship's name or "N/A" if not available
             color: ship.cargo_category_color || DEFAULT_COLOR, // Ship's color based on cargo category or default color

@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Ship;
 
 class ShipRealtimePosition extends Model
 {
@@ -25,5 +24,18 @@ class ShipRealtimePosition extends Model
         'destination',
         'latitude',
         'longitude'
+    ];
+    
+    /**
+     * Hide the following attributes from the response.
+     * 
+     * @var array<int, string>
+     */
+    public $hidden = [
+        'id',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'ship_id'
     ];
 }

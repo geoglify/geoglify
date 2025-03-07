@@ -3,7 +3,7 @@ import { BarChart } from '@/components/ui/chart-bar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 // Principais categorias de tipos de navios AIS
-const shipCategories = ['Cargo', 'Tanker', 'Passenger', 'Fishing', 'Other'];
+const shipCategories = ['Cargo', 'Tanker', 'Passenger', 'Fishing', 'Military', 'Cruise', 'Other'];
 
 // Função para gerar dados fictícios para as categorias de navios
 const generateFakeShipData = () => {

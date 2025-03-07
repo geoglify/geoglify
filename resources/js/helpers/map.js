@@ -173,4 +173,32 @@ export default {
             });
         } // Update the source using MapHelper
     },
+
+    // Get the bounds of the ships
+    getBounds(ships) {
+        const bounds = ships.reduce(
+            (acc, ship) => {
+                const coordinates = [ship.longitude, ship.latitude];
+
+                if (coordinates) {
+                    acc.minLat = Math.min(acc.minLat, coordinates[1]);
+                    acc.maxLat = Math.max(acc.maxLat, coordinates[1]);
+                    acc.minLon = Math.min(acc.minLon, coordinates[0]);
+                    acc.maxLon = Math.max(acc.maxLon, coordinates[0]);
+                }
+                return acc;
+            },
+            {
+                minLat: 90,
+                maxLat: -90,
+                minLon: 180,
+                maxLon: -180,
+            },
+        );
+
+        return [
+            [bounds.minLon, bounds.minLat],
+            [bounds.maxLon, bounds.maxLat],
+        ];
+    },
 };

@@ -178,6 +178,7 @@ const rightNavItems: NavItem[] = [
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
+                
             </div>
         </div>
 
@@ -186,5 +187,6 @@ const rightNavItems: NavItem[] = [
                 <Breadcrumbs :breadcrumbs="breadcrumbs" />
             </div>
         </div>
+        
     </div>
 </template>

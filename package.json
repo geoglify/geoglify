@@ -54,7 +54,8 @@
         "typescript": "^5.2.2",
         "vite": "^6.0.3",
         "vue": "^3.5.13",
-        "vuex": "^4.1.0",
+        "vue-i18n": "^11.1.2",
+        "vuex": "^4.0.2",
         "ziggy-js": "^2.4.2"
     },
     "optionalDependencies": {

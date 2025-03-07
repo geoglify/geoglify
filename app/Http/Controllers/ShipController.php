@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreShipRequest;
 use App\Http\Requests\UpdateShipRequest;
+use Inertia\Inertia;
 use App\Models\Ship;
+use App\Models\ShipRealtimePosition;
+use Illuminate\Support\Facades\Lang;
 
 class ShipController extends Controller
 {
@@ -13,7 +16,7 @@ class ShipController extends Controller
      */
     public function index()
     {
-       //
+        //
     }
 
     /**
@@ -37,7 +40,16 @@ class ShipController extends Controller
      */
     public function show(Ship $ship)
     {
-        //
+        $shipRealtimePosition = ShipRealtimePosition::where('ship_id', $ship->id)->latest()->first();
+
+        // Get all translations from the 'ship.php' file
+        $translations = Lang::get('ship');
+
+        return Inertia::render('ship/Show', [
+            'ship' => $ship,
+            'shipRealtimePosition' => $shipRealtimePosition,
+            'translations' => $translations,
+        ]);
     }
 
     /**

@@ -91,7 +91,21 @@ export default {
             this.mapInstance.on('click', 'shipLayer', (e) => {
                 const ship = e.features[0].properties;
                 //redirect to ship details page
-                window.location.href = `/ships/${ship.mmsi}`;
+                window.location.href = `/ships/${ship.id}`;
+            });
+
+            this.mapInstance.on('mouseenter', 'shipLayer', () => {
+                this.mapInstance.getCanvas().style.cursor = 'pointer';
+            });
+
+            this.mapInstance.on('click', 'shipLayer-skeleton', (e) => {
+                const ship = e.features[0].properties;
+                //redirect to ship details page
+                window.location.href = `/ships/${ship.id}`;
+            });
+
+            this.mapInstance.on('mouseenter', 'shipLayer-skeleton', () => {
+                this.mapInstance.getCanvas().style.cursor = 'pointer';
             });
         },
 
@@ -104,6 +118,13 @@ export default {
                 this.data.forEach((ship) => {
                     store.dispatch('addOrUpdateShip', ship);
                 });
+
+                // Fit the map to the bounds of the ship data
+                const bounds = MapHelper.getBounds(this.ships);
+                this.mapInstance.fitBounds(bounds, {
+                    padding: 100,
+                });
+
                 this.updateLoop();
             } catch (error) {
                 console.error('API Error:', error);

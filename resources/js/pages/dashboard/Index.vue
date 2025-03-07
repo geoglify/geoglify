@@ -8,7 +8,7 @@ import Map from '../../components/Map.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Ships',
+        title: 'Dashboard',
         href: '/',
     },
 ];
@@ -19,7 +19,7 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Ships" />
+    <Head title="Dashboard" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex flex-1 flex-col gap-4 p-4">

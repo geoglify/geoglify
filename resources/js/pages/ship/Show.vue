@@ -56,7 +56,7 @@ const shipRealtimePositionDetails = computed(() => {
             </div>
 
             <div class="flex-1 rounded-xl">
-                <ShipHistoryMap :ships="ship" />
+                <ShipHistoryMap :ship="ship" />
             </div>
         </div>
     </AppLayout>

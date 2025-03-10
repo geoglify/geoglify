@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import * as turf from '@turf/turf';
+import axios from 'axios';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-theme/classic.css';
 import 'maplibre-theme/icons.lucide.css';
@@ -7,22 +9,69 @@ import { defineProps, onMounted, ref } from 'vue';
 import MapHelper from './../../helpers/map';
 
 // Define props com tipagem
-defineProps<{
-    ship?: Partial<{
-        id: number;
-        mmsi: number;
-        name: string;
-        callsign: string | null;
-        imo: number | null;
-        draught: number | null;
-        created_at: string;
-        updated_at: string;
-    }>;
+const props = defineProps<{
+    ship?: object;
 }>();
 
-// Ref para armazenar o mapa
+// Refs to store the map instance and ship positions
 const map = ref<maplibregl.Map | null>(null);
+const shipPositions = ref<any>(null); // Ref para armazenar posições do navio
 
+// Function to fetch ship positions
+const fetchShipPositions = async (shipId: number, range: number) => {
+    try {
+        const response = await axios.get(`/ships/${shipId}/lastPositions/${range}`);
+        shipPositions.value = response.data;
+
+        console.log('Ship positions:', shipPositions.value);
+
+        // Check if the map and ship positions are available
+        if (map.value && shipPositions.value) {
+            const geoJsonData = shipPositions.value;
+            map.value.getSource('shipPositions')?.setData(geoJsonData);
+
+            // Find Bounding Box Of LineString
+            const bbox = turf.bbox(geoJsonData);
+
+            // Fit map to bounding box
+            map.value.fitBounds(bbox, {
+                padding: 50,
+            });
+            
+        }
+    } catch (error) {
+        console.error('Erro ao buscar as posições do navio:', error);
+    }
+};
+
+// Create the ship positions source
+const createShipPositionsSource = () => {
+    if (map.value) {
+        map.value.addSource('shipPositions', {
+            type: 'geojson',
+            data: {
+                type: 'FeatureCollection',
+                features: [],
+            },
+        });
+
+        map.value.addLayer({
+            id: 'shipPositions',
+            type: 'line',
+            source: 'shipPositions',
+            layout: {
+                'line-join': 'round',
+                'line-cap': 'round',
+            },
+            paint: {
+                'line-color': '#ff0000',
+                'line-width': 2,
+            },
+        });
+    }
+};
+
+// Function to add the ship positions to the map
 onMounted(() => {
     if (!map.value) {
         const zoom = 2;
@@ -30,6 +79,18 @@ onMounted(() => {
         const bearing = 0;
 
         map.value = MapHelper.createMap('map', center, zoom, bearing) as maplibregl.Map;
+
+        map.value.on('load', () => {
+            // Add the ship positions source
+            createShipPositionsSource();
+
+            // Check if the ship has an ID
+            if (props.ship?.id) {
+                console.log('Fetching ship positions...', props.ship.id);
+                const rangeSeconds = 60 * 60 * 7; // 7 hours
+                fetchShipPositions(props.ship.id, rangeSeconds);
+            }
+        });
     }
 });
 </script>

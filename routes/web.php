@@ -10,7 +10,13 @@ Route::get('/', function () {
 });
 
 Route::resource('dashboard', DashboardController::class)->middleware(['auth', 'verified']);
+
 Route::resource('ships', ShipController::class)->middleware(['auth', 'verified']);
+
+// Return GeoJson (LineString) with lastPositions of a ship (8h, 24h, 7d)
+Route::get('ships/{ship}/lastPositions/{range}', [ShipController::class, 'lastPositions'])
+    ->name('ships.lastPositions')
+    ->middleware(['auth', 'verified']);
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

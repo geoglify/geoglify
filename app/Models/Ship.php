@@ -39,7 +39,6 @@ class Ship extends Model
      * @var array<int, string>
      */
     public $hidden = [
-        'id',
         'created_at',
         'updated_at',
         'deleted_at',

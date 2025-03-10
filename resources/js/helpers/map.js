@@ -11,10 +11,15 @@ MapboxDraw.constants.classes.CONTROL_GROUP = 'maplibregl-ctrl-group';
  */
 export default {
     // Create a new map instance
-    createMap(container, center = [0, 0], zoom = 1, bearing = 0) {
+    createMap(container, center = [0, 0], zoom = 1, bearing = 0, isDarkMode = false) {
+        // Set the map style based on the dark mode preference
+        const style = isDarkMode
+            ? 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+            : 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json';
+
         return new maplibregl.Map({
             container: container, // HTML element ID or element to render the map
-            style: 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json', // Map style URL
+            style: style, // Map style URL
             center: center, // Initial map center [longitude, latitude]
             zoom: zoom, // Initial zoom level
             bearing: bearing, // Initial bearing (rotation)

@@ -23,8 +23,6 @@ const fetchShipPositions = async (shipId: number, range: number) => {
         const response = await axios.get(`/ships/${shipId}/lastPositions/${range}`);
         shipPositions.value = response.data;
 
-        console.log('Ship positions:', shipPositions.value);
-
         // Check if the map and ship positions are available
         if (map.value && shipPositions.value) {
             const geoJsonData = shipPositions.value;
@@ -78,7 +76,9 @@ onMounted(() => {
         const center: [number, number] = [0, 0];
         const bearing = 0;
 
-        map.value = MapHelper.createMap('map', center, zoom, bearing) as maplibregl.Map;
+        const isDarkMode = localStorage.getItem('appearance') === 'dark';
+        
+        map.value = MapHelper.createMap('map', center, zoom, bearing, isDarkMode) as maplibregl.Map;
 
         map.value.on('load', () => {
             // Add the ship positions source
@@ -86,7 +86,6 @@ onMounted(() => {
 
             // Check if the ship has an ID
             if (props.ship?.id) {
-                console.log('Fetching ship positions...', props.ship.id);
                 const rangeSeconds = 60 * 60 * 7; // 7 hours
                 fetchShipPositions(props.ship.id, rangeSeconds);
             }

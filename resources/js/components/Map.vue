@@ -62,8 +62,11 @@ export default {
                 const center = [0, 0];
                 const bearing = 0;
 
+                // Check if the user prefers dark mode
+                const isDarkMode = localStorage.getItem('appearance') === 'dark';
+                
                 // Create the map
-                this.map = MapHelper.createMap('map', center, zoom, bearing);
+                this.map = MapHelper.createMap('map', center, zoom, bearing, isDarkMode);
 
                 // Add the base layer
                 this.map.on('load', async () => {

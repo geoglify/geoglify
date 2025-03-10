@@ -87,7 +87,7 @@ export default {
             source: source,
             layout: {
                 'icon-image': ['get', 'image'], // Use the ship's icon
-                'icon-size': 1, // Set icon size
+                'icon-size': 0.8, // Set icon size
                 'icon-rotate': ['get', 'hdg'], // Rotate icon based on heading
                 'icon-rotation-alignment': 'map', // Align rotation with the map
                 'icon-allow-overlap': true, // Allow icons to overlap
@@ -132,14 +132,14 @@ export default {
             layout: {
                 'text-field': ['get', 'name'], // Display the ship's name
                 'text-font': ['Open Sans Bold'], // Set font
-                'text-size': 16, // Set text size
+                'text-size': 12, // Set text size
                 'text-anchor': 'center', // Center the text
                 'text-offset': [0, 0], // No offset
             },
             paint: {
                 'text-color': '#000000', // Set text color
                 'text-halo-color': '#fff', // Set text halo color
-                'text-halo-width': 2, // Set text halo width
+                'text-halo-width': 1, // Set text halo width
             },
             filter: ['==', ['get', 'type'], 'text'], // Filter for text features
         });

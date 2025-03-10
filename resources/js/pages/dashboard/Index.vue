@@ -2,9 +2,9 @@
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import AISLineChart from '../../components/AISLineChart.vue';
-import AISShipCategoryChart from '../../components/AISShipCategoryChart.vue';
-import Map from '../../components/Map.vue';
+import AISLineChart from '../../components/dashboard/AISLineChart.vue';
+import AISShipCategoryChart from '../../components/dashboard/AISShipCategoryChart.vue';
+import Map from '../../components/dashboard/AisMap.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

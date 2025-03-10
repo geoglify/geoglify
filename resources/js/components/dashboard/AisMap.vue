@@ -2,8 +2,8 @@
 import 'maplibre-theme/classic.css';
 import 'maplibre-theme/icons.lucide.css';
 import { mapActions, mapState } from 'vuex';
-import MapHelper from './../helpers/map';
-import ShipLayer from './ShipLayer.vue';
+import MapHelper from '../../helpers/map';
+import ShipLayer from './AisLayer.vue';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default {

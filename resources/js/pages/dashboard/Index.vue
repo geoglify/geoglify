@@ -4,7 +4,8 @@ import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import AISLineChart from '../../components/dashboard/AISLineChart.vue';
 import AISShipCategoryChart from '../../components/dashboard/AISShipCategoryChart.vue';
-import Map from '../../components/dashboard/AisMap.vue';
+import AisShipsList from '../../components/dashboard/AisShipsList.vue';
+import AisMap from '../../components/dashboard/AisMap.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -31,9 +32,11 @@ defineProps<{
                     <AISShipCategoryChart></AISShipCategoryChart>
                 </div>
             </div>
-
-            <div class="h-3/4 flex-1 rounded-xl">
-                <Map :ships="ships" />
+            
+            <div class="grid h-3/4 gap-2">
+                <div class="h-full rounded-xl">
+                    <AisMap :ships="ships" />
+                </div>
             </div>
         </div>
     </AppLayout>

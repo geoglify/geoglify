@@ -1,10 +1,10 @@
 <script lang="ts">
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import 'maplibre-theme/classic.css';
 import 'maplibre-theme/icons.lucide.css';
 import { mapActions, mapState } from 'vuex';
 import MapHelper from '../../helpers/map';
 import ShipLayer from './AisLayer.vue';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default {
     components: {
@@ -64,7 +64,7 @@ export default {
 
                 // Check if the user prefers dark mode
                 const isDarkMode = localStorage.getItem('appearance') === 'dark';
-                
+
                 // Create the map
                 this.map = MapHelper.createMap('map', center, zoom, bearing, isDarkMode);
 
@@ -104,22 +104,13 @@ export default {
 </script>
 
 <template>
-    <Card>
-        <CardHeader>
-            <CardTitle>Map</CardTitle>
-            <CardDescription>Real-time ship positions</CardDescription>
-        </CardHeader>
-        <CardContent>
-            <div id="map"></div>
-        </CardContent>
-    </Card>
-
+    <div id="map"></div>
     <ShipLayer :mapInstance="map" :data="ships" v-if="mapIsReady" />
 </template>
 
 <style>
 #map {
-    height: 570px;
+    height: 100%;
     width: 100%;
     background-color: #000;
 }

@@ -3,6 +3,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 // Import the components
 import ShipAisInfo from '../../components/ship/ShipAisInfo.vue';
@@ -45,19 +46,20 @@ const shipRealtimePositionDetails = computed(() => {
     <Head title="Ship" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex flex-1 flex-col gap-4 p-4 pt-0">
+        <div class="flex flex-1 flex-col gap-4 p-4 pt-4">
             <div class="grid gap-2 md:grid-cols-2">
-                <div class="h-full rounded-xl">
-                    <ShipDetails :ship="shipDetails" />
-                </div>
-                <div class="h-full rounded-xl">
-                    <ShipAisInfo :shipRealtimePosition="shipRealtimePositionDetails" />
-                </div>
+                <ShipDetails :ship="shipDetails" />
+                <ShipAisInfo :shipRealtimePosition="shipRealtimePositionDetails" />
             </div>
 
-            <div class="flex-1 rounded-xl">
-                <ShipHistoryMap :ship="ship" />
-            </div>
+            <Card class="flex h-full flex-col">
+                <CardHeader>
+                    <CardTitle>Map Position</CardTitle>
+                </CardHeader>
+                <CardContent class="flex-1">
+                    <ShipHistoryMap :ship="ship" />
+                </CardContent>
+            </Card>
         </div>
     </AppLayout>
 </template>

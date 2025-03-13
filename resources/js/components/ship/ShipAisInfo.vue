@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 
 defineProps<{
@@ -11,7 +11,6 @@ defineProps<{
     <Card>
         <CardHeader>
             <CardTitle>{{ $t('ship.card_ais_title') }}</CardTitle>
-            <CardDescription>{{ $t('ship.card_ais_description') }}</CardDescription>
         </CardHeader>
         <CardContent>
             <Table>

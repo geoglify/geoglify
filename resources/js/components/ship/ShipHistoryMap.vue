@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import * as turf from '@turf/turf';
 import axios from 'axios';
 import maplibregl from 'maplibre-gl';
@@ -35,7 +34,6 @@ const fetchShipPositions = async (shipId: number, range: number) => {
             map.value.fitBounds(bbox, {
                 padding: 50,
             });
-            
         }
     } catch (error) {
         console.error('Erro ao buscar as posições do navio:', error);
@@ -62,7 +60,7 @@ const createShipPositionsSource = () => {
                 'line-cap': 'round',
             },
             paint: {
-                'line-color': '#ff0000',
+                'line-color': '#000000',
                 'line-width': 2,
             },
         });
@@ -77,7 +75,7 @@ onMounted(() => {
         const bearing = 0;
 
         const isDarkMode = localStorage.getItem('appearance') === 'dark';
-        
+
         map.value = MapHelper.createMap('map', center, zoom, bearing, isDarkMode) as maplibregl.Map;
 
         map.value.on('load', () => {
@@ -95,20 +93,12 @@ onMounted(() => {
 </script>
 
 <template>
-    <Card>
-        <CardHeader>
-            <CardTitle>Map</CardTitle>
-            <CardDescription>Real-time ship positions</CardDescription>
-        </CardHeader>
-        <CardContent>
-            <div id="map"></div>
-        </CardContent>
-    </Card>
+    <div id="map"></div>
 </template>
 
 <style>
 #map {
-    height: 570px;
+    height: 100%;
     width: 100%;
     background-color: #000;
 }

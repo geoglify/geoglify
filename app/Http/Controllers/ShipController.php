@@ -9,6 +9,8 @@ use App\Models\Ship;
 use App\Models\ShipHistoricalPosition;
 use App\Models\ShipRealtimePosition;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ShipController extends Controller
 {
@@ -141,5 +143,72 @@ class ShipController extends Controller
             'type' => 'FeatureCollection',
             'features' => $segments
         ]);
+    }
+
+    /**
+     * Return the count of ships grouped by 15-second intervals
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function countShips()
+    {
+        // Define the time interval (15 seconds)
+        $interval = 5; // in seconds
+
+        // Query to get real-time ships and accumulated ships in 1-second intervals
+        $data = DB::table('ship_realtime_positions as s1')
+            ->selectRaw('FLOOR(EXTRACT(EPOCH FROM s1.last_updated) / 5) AS time_key, COUNT(DISTINCT s1.id) AS current_ships')
+            ->where('s1.last_updated', '>=', now()->subMinutes(1)) // Filter the last 30 minutes
+            ->where('s1.last_updated', '<', now()->subSeconds(10))
+            ->groupBy(DB::raw('FLOOR(EXTRACT(EPOCH FROM s1.last_updated) / 5)')) // Group by the same expression
+            ->orderBy('time_key')
+            ->get();
+
+        // Now calculate accumulated ships by joining with ShipHistoricalPosition
+        $formattedData = $data->map(function ($item) use ($interval) {
+            return [
+                'timestamp' => Carbon::createFromTimestamp($item->time_key * $interval)->format('H:i:s'), // Format the timestamp
+                'ships' => $item->current_ships, // Number of current ships in the interval
+            ];
+        });
+
+        // Return or process the formatted data as needed
+        return $formattedData;
+    }
+
+    /**
+     * Return the count of ships by type
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function topShipTypes()
+    {
+        $data = [
+            ['type' => 'Container Ship', 'count' => 100],
+            ['type' => 'Bulk Carrier', 'count' => 80],
+            ['type' => 'Tanker', 'count' => 60],
+            ['type' => 'General Cargo', 'count' => 40],
+            ['type' => 'Ro-Ro', 'count' => 20],
+        ];
+
+        return response()->json($data);
+    }
+
+    /**
+     * Return the count of ships by country
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function countCountries()
+    {
+        $data = [
+            ['country' => 'Panama', 'count' => 100],
+            ['country' => 'Liberia', 'count' => 80],
+            ['country' => 'Marshall Islands', 'count' => 60],
+            ['country' => 'Singapore', 'count' => 40],
+            ['country' => 'Hong Kong', 'count' => 20],
+        ];
+
+        return response()->json($data);
     }
 }

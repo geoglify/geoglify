@@ -1,27 +1,32 @@
 <script setup lang="ts">
 import { LineChart } from '@/components/ui/chart-line';
+import { onMounted, onUnmounted, ref } from 'vue';
 
-// Função para gerar dados fake
-const generateFakeAISData = () => {
-    const data = [];
-    const now = new Date();
-    // Fixa o horário em 00:00:00
-    now.setHours(0, 0, 0, 0);
+const aisData = ref([]);
+let intervalId = null;
 
-    const endTime = new Date(now.getTime() + 15 * 60000); // 15 minutos depois
-
-    while (now <= endTime) {
-        data.push({
-            timestamp: new Date(now).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
-            ships: Math.floor(Math.random() * 100), // Número aleatório de navios entre 0 e 100
+async function fetchAISData() {
+    try {
+        const response = await fetch('/realtime/ships/count', {
+            credentials: 'include',
         });
-        now.setMinutes(now.getMinutes() + 1); // Incrementa 1 minuto
+        const data = await response.json();
+        aisData.value = data;
+    } catch (error) {
+        console.error('Erro ao buscar dados da API:', error);
     }
+}
 
-    return data;
-};
+onMounted(() => {
+    fetchAISData(); // Busca os dados imediatamente ao montar o componente
+    intervalId = setInterval(fetchAISData, 5000); // Atualiza a cada 5 segundos
+});
 
-const aisData = generateFakeAISData();
+onUnmounted(() => {
+    if (intervalId) {
+        clearInterval(intervalId); // Limpa o intervalo quando o componente é desmontado
+    }
+});
 </script>
 
 <template>

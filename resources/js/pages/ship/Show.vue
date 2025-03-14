@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 // Import the components
 import ShipAisInfo from '../../components/ship/ShipAisInfo.vue';
@@ -48,8 +48,23 @@ const shipRealtimePositionDetails = computed(() => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex flex-1 flex-col gap-4 p-4 pt-4">
             <div class="grid gap-2 md:grid-cols-2">
-                <ShipDetails :ship="shipDetails" />
-                <ShipAisInfo :shipRealtimePosition="shipRealtimePositionDetails" />
+                <Card class="flex h-full flex-col">
+                    <CardHeader>
+                        <CardTitle>{{ $t('ship.card_details_title') }}</CardTitle>
+                    </CardHeader>
+                    <CardContent class="flex-1">
+                        <ShipDetails :ship="shipDetails" />
+                    </CardContent>
+                </Card>
+
+                <Card class="flex h-full flex-col">
+                    <CardHeader>
+                        <CardTitle>{{ $t('ship.card_ais_title') }}</CardTitle>
+                    </CardHeader>
+                    <CardContent class="flex-1">
+                        <ShipAisInfo :shipRealtimePosition="shipRealtimePositionDetails" />
+                    </CardContent>
+                </Card>
             </div>
 
             <Card class="flex h-full flex-col">

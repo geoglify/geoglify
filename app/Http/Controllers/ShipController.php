@@ -8,6 +8,7 @@ use Inertia\Inertia;
 use App\Models\Ship;
 use App\Models\ShipHistoricalPosition;
 use App\Models\ShipRealtimePosition;
+use App\Models\ShipLatestPositionView;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -146,50 +147,49 @@ class ShipController extends Controller
     }
 
     /**
-     * Return the count of ships grouped by 15-second intervals
-     * 
+     * Return the count of ships grouped by 15-second intervals.
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function countShips()
     {
-        // Define the time interval (15 seconds)
-        $interval = 5; // in seconds
+        $interval = 15; // 15-second interval
 
-        // Query to get real-time ships and accumulated ships in 1-second intervals
-        $data = DB::table('ship_realtime_positions as s1')
-            ->selectRaw('FLOOR(EXTRACT(EPOCH FROM s1.last_updated) / 5) AS time_key, COUNT(DISTINCT s1.id) AS current_ships')
-            ->where('s1.last_updated', '>=', now()->subMinutes(1)) // Filter the last 30 minutes
-            ->where('s1.last_updated', '<', now()->subSeconds(10))
-            ->groupBy(DB::raw('FLOOR(EXTRACT(EPOCH FROM s1.last_updated) / 5)')) // Group by the same expression
+        $data = DB::table('ship_realtime_positions')
+            ->select(
+                DB::raw('FLOOR(EXTRACT(EPOCH FROM last_updated) / ' . $interval . ') AS time_key'),
+                DB::raw('COUNT(DISTINCT id) AS current_ships')
+            )
+            ->where('last_updated', '>=', now()->subMinute(5)) // Last 5 minute
+            ->groupBy(DB::raw('FLOOR(EXTRACT(EPOCH FROM last_updated) / ' . $interval . ')'))
             ->orderBy('time_key')
             ->get();
 
-        // Now calculate accumulated ships by joining with ShipHistoricalPosition
-        $formattedData = $data->map(function ($item) use ($interval) {
-            return [
-                'timestamp' => Carbon::createFromTimestamp($item->time_key * $interval)->format('H:i:s'), // Format the timestamp
-                'ships' => $item->current_ships, // Number of current ships in the interval
-            ];
-        });
+        $formattedData = $data->map(fn($item) => [
+            'timestamp' => Carbon::createFromTimestamp($item->time_key * $interval)->format('H:i:s'),
+            'ships' => $item->current_ships
+        ]);
 
-        // Return or process the formatted data as needed
-        return $formattedData;
+        return response()->json($formattedData);
     }
 
     /**
-     * Return the count of ships by type
-     * 
+     * Return the count of ships by category (top 5).
+     *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function topShipTypes()
+    public function topCategories()
     {
-        $data = [
-            ['type' => 'Container Ship', 'count' => 100],
-            ['type' => 'Bulk Carrier', 'count' => 80],
-            ['type' => 'Tanker', 'count' => 60],
-            ['type' => 'General Cargo', 'count' => 40],
-            ['type' => 'Ro-Ro', 'count' => 20],
-        ];
+        $data = ShipLatestPositionView::select(
+            'cargo_category_name as category',
+            'cargo_category_color as color',
+            DB::raw('COUNT(*) as count')
+        )
+            ->whereNotNull('cargo_category_name')
+            ->groupBy('cargo_category_name', 'cargo_category_color')
+            ->orderByDesc('count')
+            ->limit(5)
+            ->get();
 
         return response()->json($data);
     }
@@ -199,15 +199,17 @@ class ShipController extends Controller
      * 
      * @return \Illuminate\Http\JsonResponse
      */
-    public function countCountries()
+    public function topCountries()
     {
-        $data = [
-            ['country' => 'Panama', 'count' => 100],
-            ['country' => 'Liberia', 'count' => 80],
-            ['country' => 'Marshall Islands', 'count' => 60],
-            ['country' => 'Singapore', 'count' => 40],
-            ['country' => 'Hong Kong', 'count' => 20],
-        ];
+        $data = ShipLatestPositionView::select(
+            'country_name as country',
+            DB::raw('COUNT(*) as count')
+        )
+            ->whereNotNull('country_name')
+            ->groupBy('country_name')
+            ->orderByDesc('count')
+            ->limit(5)
+            ->get();
 
         return response()->json($data);
     }

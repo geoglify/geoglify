@@ -1,25 +1,29 @@
 <script setup lang="ts">
 import { BarChart } from '@/components/ui/chart-bar';
+import { onMounted, onUnmounted, ref } from 'vue';
 
-// Lista de países fictícios
-const countries = ['USA', 'China', 'Japan', 'Germany', 'UK'];
+const data = ref([]);
+let intervalId: number | null | undefined = null;
 
-// Função para gerar dados fictícios para a contagem de navios por país
-const generateFakeShipDataByCountry = () => {
-    return countries.map((country) => ({
-        country,
-        count: Math.floor(Math.random() * 1000) + 200, // Quantidade aleatória de navios
-    }));
-};
+async function fetchData() {
+    try {
+        const response = await fetch('/realtime/ships/top-countries');
+        data.value = await response.json();
+    } catch (error) {
+        console.error('Error fetching data from API:', error);
+    }
+}
 
-// Função para filtrar os top 5 países com mais navios
-const getTop5Countries = (data: { country: string; count: number }[]) => {
-    return data.sort((a, b) => b.count - a.count).slice(0, 5);
-};
+onMounted(() => {
+    fetchData();
+    intervalId = setInterval(fetchData, 5000);
+});
 
-// Dados de navios por país
-const shipDataByCountry = generateFakeShipDataByCountry();
-const top5Countries = getTop5Countries(shipDataByCountry);
+onUnmounted(() => {
+    if (intervalId) {
+        clearInterval(intervalId);
+    }
+});
 </script>
 
 <template>
@@ -27,14 +31,10 @@ const top5Countries = getTop5Countries(shipDataByCountry);
         <BarChart
             class="h-[200px]"
             index="country"
-            :data="top5Countries"
+            :data="data"
             :showLegend="false"
             :categories="['count']"
-            :y-formatter="
-                (tick, i) => {
-                    return typeof tick === 'number' ? `${new Intl.NumberFormat('us').format(tick).toString()}` : '';
-                }
-            "
+            :y-formatter="(tick: any) => tick"
             :rounded-corners="4"
         />
     </div>

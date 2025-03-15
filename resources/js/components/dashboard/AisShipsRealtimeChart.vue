@@ -2,33 +2,37 @@
 import { LineChart } from '@/components/ui/chart-line';
 import { onMounted, onUnmounted, ref } from 'vue';
 
-const aisData = ref([]);
-let intervalId = null;
+const data = ref([]);
+let intervalId: number | null | undefined = null;
 
-async function fetchAISData() {
+async function fetchData() {
     try {
-        const response = await fetch('/realtime/ships/count', {
-            credentials: 'include',
-        });
-        const data = await response.json();
-        aisData.value = data;
+        const response = await fetch('/realtime/ships/count');
+        data.value = await response.json();
     } catch (error) {
-        console.error('Erro ao buscar dados da API:', error);
+        console.error('Error fetching data from API:', error);
     }
 }
 
 onMounted(() => {
-    fetchAISData(); // Busca os dados imediatamente ao montar o componente
-    intervalId = setInterval(fetchAISData, 5000); // Atualiza a cada 5 segundos
+    fetchData();
+    intervalId = setInterval(fetchData, 5000);
 });
 
 onUnmounted(() => {
     if (intervalId) {
-        clearInterval(intervalId); // Limpa o intervalo quando o componente é desmontado
+        clearInterval(intervalId);
     }
 });
 </script>
 
 <template>
-    <LineChart class="h-[200px]" :data="aisData" index="timestamp" :showLegend="false" :categories="['ships']" :y-formatter="(tick) => tick" />
+    <LineChart
+        class="h-[200px]"
+        :data="data"
+        index="timestamp"
+        :showLegend="false"
+        :categories="['ships']"
+        :y-formatter="(tick: any) => tick"
+    ></LineChart>
 </template>

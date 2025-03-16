@@ -3,7 +3,7 @@ import { BarChart } from '@/components/ui/chart-bar';
 import { onMounted, onUnmounted, ref } from 'vue';
 
 const data = ref([]);
-const colors = ref<Record<string, string>>({}); // Stores colors per category
+const colors = ref([]);
 let intervalId: number | null | undefined = null;
 
 async function fetchData() {

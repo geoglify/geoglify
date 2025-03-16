@@ -83,6 +83,8 @@ function handleLegendItemClick(d: BulletLegendItemInterface, i: number) {
         :grid-line="false"
         :tick-line="false"
         tick-text-color="hsl(var(--vis-text-color))"
+        :tickValues="Array.from({ length: data.length }, (_, i) => i)"
+        :tickTextHideOverlapping="true"
       />
       <VisAxis
         v-if="showYAxis"

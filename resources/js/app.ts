@@ -10,6 +10,7 @@ import { initializeTheme } from './composables/useAppearance';
 import Vuex from "vuex";
 import store from './store';
 import i18n from './i18n';
+import CountryFlag from 'vue-country-flag-next';
 
 // Extend ImportMeta interface for Vite...
 declare module 'vite/client' {
@@ -36,6 +37,7 @@ createInertiaApp({
             .use(store)
             .use(i18n)
             .use(ZiggyVue)
+            .use(CountryFlag)
             .mount(el);
     },
     progress: {

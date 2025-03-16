@@ -5,71 +5,69 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { valueUpdater } from '@/utils.ts';
 import type { ColumnDef, ColumnFiltersState, SortingState, VisibilityState } from '@tanstack/vue-table';
 import { FlexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useVueTable } from '@tanstack/vue-table';
-import { ArrowUpDown } from 'lucide-vue-next';
+import { ArrowRight } from 'lucide-vue-next';
 import { h, ref } from 'vue';
 
+// Define the type for the ship data
 export interface Ship {
     name: string;
     mmsi: string;
     last_updated: string;
+    country_iso_code: string;
 }
 
+// Props passed to the component
 const props = defineProps<{
     ships?: Ship[];
 }>();
 
+// Default ship data
 const data: Ship[] = props.ships || [];
 
+// Define the columns for the table
 const columns: ColumnDef<Ship>[] = [
     {
+        accessorKey: 'country_iso_code',
+        header: 'Flag', // Column header
+        cell: ({ row }) => row.getValue('country_iso_code'), // Render flag column data
+    },
+    {
         accessorKey: 'name',
-        header: ({ column }) => {
-            return h(
-                Button,
-                {
-                    variant: 'ghost',
-                    onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-                },
-                () => ['NAME', h(ArrowUpDown, { class: 'h-4 w-4' })],
-            );
-        },
-        cell: ({ row }) => h('div', { class: 'capitalize' }, row.getValue('name')),
+        header: 'Name', // Column header
+        cell: ({ row }) => h('div', { class: 'capitalize' }, row.getValue('name')), // Render name column data
     },
+    // Details column for action (with a button to open the ship's page)
     {
-        accessorKey: 'mmsi',
-        header: ({ column }) => {
+        accessorKey: 'id', // Unique identifier for the ship
+        header: '', // Column header
+        cell: ({ row }) => {
+            const shipId = row.getValue('id'); // Use the ship's id as identifier
             return h(
                 Button,
                 {
-                    variant: 'ghost',
-                    onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+                    variant: 'outline',
+                    size: 'sm',
+                    class: 'ml-auto',
+                    onClick: () => {
+                        // Redirect to the ship details page
+                        window.location.href = `/ships/${shipId}`;
+                    },
                 },
-                () => ['MMSI', h(ArrowUpDown, { class: 'h-4 w-4' })],
+                () => [
+                    h(ArrowRight, { class: 'h-4 w-4 text-right' }), // Button with an arrow icon
+                ],
             );
         },
-        cell: ({ row }) => h('div', { class: 'lowercase' }, row.getValue('mmsi')),
-    },
-    {
-        accessorKey: 'last_updated',
-        header: ({ column }) => {
-            return h(
-                Button,
-                {
-                    variant: 'ghost',
-                    onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-                },
-                () => ['Last Updated', h(ArrowUpDown, { class: 'h-4 w-4' })],
-            );
-        },
-        cell: ({ row }) => h('div', { class: 'text-right' }, "2025-03-01 12:00:00"),
     },
 ];
 
+// State management for table sorting, filters, visibility, and row selection
 const sorting = ref<SortingState>([]);
 const columnFilters = ref<ColumnFiltersState>([]);
 const columnVisibility = ref<VisibilityState>({});
 const rowSelection = ref({});
 
+// Initialize the table using the Vue Table hooks
 const table = useVueTable({
     data,
     columns,
@@ -96,15 +94,14 @@ const table = useVueTable({
         },
     },
     initialState: {
-        pagination: {
-            pageSize: 8, // Define o tamanho da página como 5
-        },
+        pagination: { pageSize: 8 },
     },
 });
 </script>
 
 <template>
     <div class="w-full">
+        <!-- Filter input for filtering ship names -->
         <div class="flex items-center pb-2">
             <Input
                 class="max-w"
@@ -113,23 +110,41 @@ const table = useVueTable({
                 @update:model-value="table.getColumn('name')?.setFilterValue($event)"
             />
         </div>
+
+        <!-- Table structure with header and body -->
         <div class="rounded-md border">
             <Table>
                 <TableHeader>
                     <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
                         <TableHead v-for="header in headerGroup.headers" :key="header.id">
+                            <!-- Render each column header dynamically -->
                             <FlexRender v-if="!header.isPlaceholder" :render="header.column.columnDef.header" :props="header.getContext()" />
                         </TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
+                    <!-- Render table rows if available -->
                     <template v-if="table.getRowModel().rows?.length">
                         <TableRow v-for="row in table.getRowModel().rows" :key="row.id" :data-state="row.getIsSelected() && 'selected'">
-                            <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
-                                <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" class="p-1" />
+                            <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id" class="truncate p-1">
+                                <template v-if="cell.column.id === 'country_iso_code'">
+                                    <!-- Render country flag based on country_iso_code -->
+                                    <country-flag
+                                        v-if="row.getValue('country_iso_code')"
+                                        rounded
+                                        :country="row.getValue('country_iso_code')"
+                                        size="normal"
+                                    />
+                                </template>
+                                <template v-else>
+                                    <!-- Render other cell content -->
+                                    <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+                                </template>
                             </TableCell>
                         </TableRow>
                     </template>
+
+                    <!-- If no rows, show a message -->
                     <TableRow v-else>
                         <TableCell :colspan="columns.length" class="h-24 text-center"> No results. </TableCell>
                     </TableRow>
@@ -137,10 +152,9 @@ const table = useVueTable({
             </Table>
         </div>
 
+        <!-- Pagination controls -->
         <div class="flex items-center justify-end space-x-2 py-4">
-            <div class="flex-1 text-sm text-muted-foreground">
-                {{ table.getFilteredRowModel().rows.length }} results
-            </div>
+            <div class="flex-1 text-sm text-muted-foreground">{{ table.getFilteredRowModel().rows.length }} results</div>
             <div class="space-x-2">
                 <Button variant="outline" size="sm" :disabled="!table.getCanPreviousPage()" @click="table.previousPage()"> Previous </Button>
                 <Button variant="outline" size="sm" :disabled="!table.getCanNextPage()" @click="table.nextPage()"> Next </Button>
@@ -148,3 +162,12 @@ const table = useVueTable({
         </div>
     </div>
 </template>
+
+<style>
+/* Add styling for truncating text in table cells */
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+</style>

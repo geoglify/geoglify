@@ -166,7 +166,7 @@ class ShipController extends Controller
             ->get();
 
         $formattedData = $data->map(fn($item) => [
-            'timestamp' => Carbon::createFromTimestamp($item->time_key * $interval)->format('H:i:s'),
+            'timestamp' => Carbon::createFromTimestamp($item->time_key * $interval)->format('H:i'),
             'ships' => $item->current_ships
         ]);
 

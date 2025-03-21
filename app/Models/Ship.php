@@ -12,7 +12,7 @@ class Ship extends Model
     /**
      * Append the following attributes to the response.
      */
-    protected $appends = ['width', 'length', 'cargo_name'];
+    protected $appends = ['width', 'length'];
 
     /**
      * The attributes that are mass assignable.
@@ -75,10 +75,50 @@ class Ship extends Model
     }
 
     /**
-     * Get Cargo Name
+     * Get the latest position of the ship.
      */
-    public function getCargoNameAttribute()
+    public function latestPosition()
     {
-        return $this->cargoType ? $this->cargoType->name : 'Unknown'; // Return a default value if cargoType is null
+        return $this->hasOne(ShipHistoricalPosition::class)->latest();
+    }
+    
+    /**
+     * Get the last realtime position of the ship.
+     */
+    public function lastRealtimePosition()
+    {
+        return $this->hasOne(ShipRealtimePosition::class)->latest();
+    }
+
+    /**
+     * Get the historical positions of the ship.
+     */
+    public function historicalPositions()
+    {
+        return $this->hasMany(ShipHistoricalPosition::class);
+    }
+
+    /**
+     * Get the country of the ship.
+     */
+    public function country()
+    {
+        return $this->belongsTo(Country::class, 'mmsi_prefix', 'number');
+    }
+
+    /**
+     * Get the MMSI prefix of the ship.
+     */
+    public function getMmsiPrefixAttribute()
+    {
+        return (int) substr($this->mmsi, 0, 3);
+    }
+    
+    /**
+     * Get status of the ship.
+     */
+    public function getStatusAttribute()
+    {
+        return $this->lastRealtimePosition ? 'LIVE' : 'OFFLINE';
     }
 }

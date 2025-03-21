@@ -13,7 +13,7 @@ export default {
     	extend: {
     		fontFamily: {
     			sans: [
-    				'Instrument Sans',
+    				'Geist Mono',
                     ...defaultTheme.fontFamily.sans
                 ]
     		},

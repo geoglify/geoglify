@@ -12,15 +12,97 @@ use App\Models\ShipLatestPositionView;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class ShipController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $search = $request->query('search');
+        $sortField = $request->query('sort', 'name');
+        $sortDirection = $request->query('direction', 'asc');
+        $perPage = $request->query('perPage', 10);
+
+        // Query ships with necessary relationships
+        $query = Ship::query()
+            ->with(['cargoType.cargoCategory', 'country'])
+            ->leftJoin('cargo_types', 'ships.cargo_type_id', '=', 'cargo_types.id')
+            ->leftJoin('cargo_categories', 'cargo_types.cargo_category_id', '=', 'cargo_categories.id')
+            ->leftJoin('countries', DB::raw('CAST(LEFT(ships.mmsi::TEXT, 3) AS INTEGER)'), '=', 'countries.number');
+
+        // Filter by search term if it exists
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('ships.name', 'like', "%$search%")
+                    ->orWhere('cargo_types.name', 'like', "%$search%")
+                    ->orWhere('cargo_categories.name', 'like', "%$search%")
+                    ->orWhere('countries.name', 'like', "%$search%");
+            });
+        }
+        
+        //onyl if imo and callsign are not null
+        $query->whereNotNull('imo')->whereNotNull('callsign');
+
+        // Sorting (only allow certain fields)
+        $allowedSortFields = [
+            'name' => 'ships.name',
+            'cargo_type_name' => 'cargo_types.name',
+            'cargo_category_name' => 'cargo_categories.name',
+            'country_name' => 'countries.name',
+        ];
+        $sortColumn = $allowedSortFields[$sortField] ?? 'ships.name';
+        $query->orderBy($sortColumn, $sortDirection);
+
+        // Select necessary columns
+        $query->select([
+            'ships.id',
+            'ships.name',
+            'ships.mmsi',
+            'ships.imo',
+            'ships.callsign',
+            'cargo_types.name as cargo_type_name',
+            'cargo_categories.name as cargo_category_name',
+            'countries.name as country_name',
+            'countries.iso_code as country_iso_code',
+        ]);
+
+        // Paginate results
+        $ships = $query->paginate($perPage);
+
+        // Format the results
+        $formattedShips = $ships->getCollection()->map(function ($ship) {
+            return [
+                'id' => $ship->id,
+                'name' => $ship->name,
+                'mmsi' => $ship->mmsi,
+                'imo' => $ship->imo,
+                'callsign' => $ship->callsign,
+                'last_updated' => $ship->latestPosition ? $ship->latestPosition->last_updated : null,
+                'cargo_type' => ['name' => $ship->cargo_type_name],
+                'cargo_category' => ['name' => $ship->cargo_category_name],
+                'country' => [
+                    'name' => $ship->country_name,
+                    'country_iso_code' => $ship->country_iso_code,
+                ],
+                'status' => $ship->status,
+            ];
+        });
+
+        // Replace the original collection with the formatted collection
+        $ships->setCollection($formattedShips);
+
+        return Inertia::render('ship/Index', [
+            'ships' => $ships,
+            'filters' => [
+                'search' => $search,
+                'sort' => $sortField,
+                'direction' => $sortDirection,
+                'perPage' => $perPage,
+            ],
+        ]);
     }
 
     /**

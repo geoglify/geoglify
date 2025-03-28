@@ -5,8 +5,14 @@ return [
     'card_details_title' => 'Ship Information',
     'card_details_description' => 'All information about ship',
     
+    
     'card_ais_title' => 'AIS Information',
     'card_ais_description' => 'All information about AIS',
+    
+    'card_photo_title' => 'Ship Photo (provided by MarineTraffic)',
+    'card_photo_description' => 'Photo of the ship',
+    
+    'no_photo_available' => 'No photo available',
 
     'id' => 'ID',
     'mmsi' => 'MMSI',

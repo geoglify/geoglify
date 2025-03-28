@@ -40,6 +40,17 @@ const shipRealtimePositionDetails = computed(() => {
         value: value ?? 'N/A', // Replace null values with 'N/A'
     }));
 });
+
+// Compute the ship photo URL
+const shipPhotoUrl = computed(() => {
+    if (!props.ship || !props.ship.mmsi) return null;
+    return `https://photos.marinetraffic.com/ais/showphoto.aspx?mmsi=${props.ship.mmsi}`;
+});
+
+// Handle image loading errors
+const handleImageError = () => {
+    imageError.value = true;
+};
 </script>
 
 <template>
@@ -47,7 +58,22 @@ const shipRealtimePositionDetails = computed(() => {
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex flex-1 flex-col gap-4 p-4 pt-4">
-            <div class="grid gap-2 md:grid-cols-2">
+            <div class="grid gap-2 lg:grid-cols-3">
+                <!-- Ship Photo by MarineTraffic -->
+                <Card class="flex h-full flex-col">
+                    <CardHeader>
+                        <CardTitle>{{ $t('ship.card_photo_title') }}</CardTitle>
+                    </CardHeader>
+                    <CardContent class="flex flex-1 flex-col">
+                        <div class="flex max-h-[300px] flex-1 items-center justify-center overflow-hidden">
+                            <img v-if="shipPhotoUrl" :src="shipPhotoUrl" alt="Ship Photo" class="h-full w-full" />
+                            <div v-else class="p-4 text-center text-gray-400">
+                                {{ $t('ship.no_photo_available') }}
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
                 <Card class="flex h-full flex-col">
                     <CardHeader>
                         <CardTitle>{{ $t('ship.card_details_title') }}</CardTitle>
@@ -69,7 +95,7 @@ const shipRealtimePositionDetails = computed(() => {
 
             <Card class="flex h-full flex-col">
                 <CardHeader>
-                    <CardTitle>Map Position</CardTitle>
+                    <CardTitle>Map Positions</CardTitle>
                 </CardHeader>
                 <CardContent class="flex-1">
                     <ShipHistoryMap :ship="ship" />

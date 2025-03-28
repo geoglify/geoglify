@@ -24,7 +24,7 @@ class ShipController extends Controller
         $search = $request->query('search');
         $sortField = $request->query('sort', 'name');
         $sortDirection = $request->query('direction', 'asc');
-        $perPage = $request->query('perPage', 10);
+        $perPage = $request->query('perPage', 20);
 
         // Query ships with necessary relationships
         $query = Ship::query()

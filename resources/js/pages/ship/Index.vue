@@ -12,11 +12,12 @@ const props = defineProps<{
 
 const columns = [
     { accessorKey: 'mmsi', header: 'MMSI' },
-    { accessorKey: 'country_name', header: 'Flag' },
+    { accessorKey: 'flag', header: 'Flag' },
     { accessorKey: 'name', header: 'Name' },
     { accessorKey: 'imo', header: 'IMO' },
     { accessorKey: 'callsign', header: 'Call Sign' },
     { accessorKey: 'cargo_category_name', header: 'Cargo Category' },
+    { accessorKey: 'cargo_type_name', header: 'Cargo Type' },
     { accessorKey: 'status', header: 'Status' },
     { accessorKey: 'last_updated', header: 'Last Updated' },
     { accessorKey: 'id', header: '' },
@@ -37,10 +38,14 @@ const breadcrumbs = [{ title: 'Ships', href: '/' }];
         defaultSort="name"
     >
         <!-- Custom cell for country flag -->
-        <template #cell-country_name="{ row }">
+        <template #cell-flag="{ row }">
             <div class="flex items-center space-x-2">
-                <country-flag :country="row.country?.country_iso_code" rounded />
-                <Label class="mt-2">{{ row.country?.name }}</Label>
+                <country-flag
+                    :country="row.country_iso_code || ''"
+                    :class="{ 'bg-primary': Boolean(row.country_iso_code) }"
+                    rounded
+                />
+                <Label class="mt-2">{{ row.country_name ?? 'N/A' }}</Label>
             </div>
         </template>
 

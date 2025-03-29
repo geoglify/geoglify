@@ -16,92 +16,70 @@ use Illuminate\Http\Request;
 
 class ShipController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
-        $search = $request->query('search');
-        $sortField = $request->query('sort', 'name');
-        $sortDirection = $request->query('direction', 'asc');
-        $perPage = $request->query('perPage', 20);
+        // Retrieve filter parameters from the request
+        $filters = $request->only(['search', 'sort', 'direction', 'perPage']);
 
-        // Query ships with necessary relationships
+        // Set default values for sorting and pagination
+        $sortField = $filters['sort'] ?? 'name';
+        $sortDirection = $filters['direction'] ?? 'asc';
+        $perPage = $filters['perPage'] ?? 20;
+
+        // Start building the query for fetching ships data
         $query = Ship::query()
-            ->with(['cargoType.cargoCategory', 'country'])
-            ->leftJoin('cargo_types', 'ships.cargo_type_id', '=', 'cargo_types.id')
-            ->leftJoin('cargo_categories', 'cargo_types.cargo_category_id', '=', 'cargo_categories.id')
-            ->leftJoin('countries', DB::raw('CAST(LEFT(ships.mmsi::TEXT, 3) AS INTEGER)'), '=', 'countries.number');
+            ->leftJoin('cargo_types', 'ships.cargo_type_id', '=', 'cargo_types.id') // Join with cargo_types table
+            ->leftJoin('cargo_categories', 'cargo_types.cargo_category_id', '=', 'cargo_categories.id') // Join with cargo_categories table
+            ->leftJoin('countries', DB::raw('CAST(LEFT(ships.mmsi::TEXT, 3) AS INTEGER)'), '=', 'countries.number') // Join with countries table based on mmsi
+            ->leftJoin('ship_realtime_positions', 'ships.id', '=', 'ship_realtime_positions.ship_id') // Join with ship_realtime_positions table to get the latest position
+            ->whereNotNull(['ships.imo', 'ships.callsign']); // Ensure that imo and callsign are not null
 
-        // Filter by search term if it exists
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('ships.name', 'like', "%$search%")
-                    ->orWhere('cargo_types.name', 'like', "%$search%")
-                    ->orWhere('cargo_categories.name', 'like', "%$search%")
-                    ->orWhere('countries.name', 'like', "%$search%");
+        // Apply search filter if provided
+        if (!empty($filters['search'])) {
+            $query->where(function ($q) use ($filters) {
+                // Search in multiple fields like mmsi, name, imo, callsign, cargo types, and categories
+                $q->where('ships.mmsi', 'ilike', "%{$filters['search']}%")
+                    ->orWhere('countries.name', 'ilike', "%{$filters['search']}%")
+                    ->orWhere('ships.name', 'ilike', "%{$filters['search']}%")
+                    ->orWhere('ships.imo', 'ilike', "%{$filters['search']}%")
+                    ->orWhere('ships.callsign', 'ilike', "%{$filters['search']}%")
+                    ->orWhere('cargo_types.name', 'ilike', "%{$filters['search']}%")
+                    ->orWhere('cargo_categories.name', 'ilike', "%{$filters['search']}%");
             });
         }
-        
-        //onyl if imo and callsign are not null
-        $query->whereNotNull('imo')->whereNotNull('callsign');
 
-        // Sorting (only allow certain fields)
-        $allowedSortFields = [
+        // Define sortable fields, including the status based on the availability of last_updated
+        $sortableFields = [
+            'status' => DB::raw('CASE WHEN ship_realtime_positions.last_updated IS NOT NULL THEN \'live\' ELSE \'offline\' END'),
+            'last_updated' => 'ship_realtime_positions.last_updated',
             'name' => 'ships.name',
-            'cargo_type_name' => 'cargo_types.name',
-            'cargo_category_name' => 'cargo_categories.name',
-            'country_name' => 'countries.name',
+            'mmsi' => 'ships.mmsi',
         ];
-        $sortColumn = $allowedSortFields[$sortField] ?? 'ships.name';
-        $query->orderBy($sortColumn, $sortDirection);
 
-        // Select necessary columns
-        $query->select([
+        // Order by the selected field and direction
+        $query->orderBy($sortableFields[$sortField] ?? 'ships.name', $sortDirection);
+
+        // Select the necessary columns, including the dynamically calculated status
+        $ships = $query->select([
             'ships.id',
             'ships.name',
             'ships.mmsi',
             'ships.imo',
             'ships.callsign',
+            DB::raw('CASE WHEN ship_realtime_positions.last_updated IS NOT NULL THEN \'live\' ELSE \'offline\' END as status'), // Dynamic status calculation
+            'ship_realtime_positions.last_updated',
             'cargo_types.name as cargo_type_name',
             'cargo_categories.name as cargo_category_name',
             'countries.name as country_name',
             'countries.iso_code as country_iso_code',
-        ]);
+        ])->paginate($perPage); // Paginate the results
 
-        // Paginate results
-        $ships = $query->paginate($perPage);
-
-        // Format the results
-        $formattedShips = $ships->getCollection()->map(function ($ship) {
-            return [
-                'id' => $ship->id,
-                'name' => $ship->name,
-                'mmsi' => $ship->mmsi,
-                'imo' => $ship->imo,
-                'callsign' => $ship->callsign,
-                'last_updated' => $ship->latestPosition ? $ship->latestPosition->last_updated : null,
-                'cargo_type' => ['name' => $ship->cargo_type_name],
-                'cargo_category' => ['name' => $ship->cargo_category_name],
-                'country' => [
-                    'name' => $ship->country_name,
-                    'country_iso_code' => $ship->country_iso_code,
-                ],
-                'status' => $ship->status,
-            ];
-        });
-
-        // Replace the original collection with the formatted collection
-        $ships->setCollection($formattedShips);
-
+        // Map over the ships to add 'last_updated' and merge into the final result
         return Inertia::render('ship/Index', [
-            'ships' => $ships,
-            'filters' => [
-                'search' => $search,
-                'sort' => $sortField,
-                'direction' => $sortDirection,
-                'perPage' => $perPage,
-            ],
+            'ships' => $ships->setCollection($ships->getCollection()->map(fn($ship) => array_merge($ship->toArray(), [
+                'last_updated' => $ship->last_updated, // Include last_updated in the final data
+            ]))),
+            'filters' => $filters, // Return the filters used for the query
         ]);
     }
 

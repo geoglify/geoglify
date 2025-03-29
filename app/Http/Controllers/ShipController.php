@@ -163,20 +163,19 @@ class ShipController extends Controller
     }
 
     /**
-     * Return the last positions of a ship 
-     * (8 hours, 24 hours, 7 days)
+     * Return the last positions of a ship in the last x seconds.
      * 
      * @param Ship $ship
-     * @param int $range
+     * @param int $seconds
      * 
      * @return \Illuminate\Http\JsonResponse
      */
-    public function lastPositions(Ship $ship, $range)
+    public function lastPositions(Ship $ship, $seconds)
     {
         $shipHistoricalPositions = ShipHistoricalPosition::where('ship_id', $ship->id)
             ->whereNotNull('longitude')
             ->whereNotNull('latitude')
-            ->where('last_updated', '>=', now()->subHours($range))
+            ->where('last_updated', '>=', now()->subSeconds($seconds))
             ->orderBy('last_updated', 'asc')
             ->get();
 
@@ -219,7 +218,7 @@ class ShipController extends Controller
         }
 
         if (empty($segments)) {
-            return response()->json(['message' => 'No valid segments found in the last 24 hours'], 404);
+            return response()->json(['message' => 'No valid segments found in the last ' . $seconds . ' seconds'], 404);
         }
 
         return response()->json([

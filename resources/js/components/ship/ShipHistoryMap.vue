@@ -7,19 +7,19 @@ import 'maplibre-theme/icons.lucide.css';
 import { defineProps, onMounted, ref } from 'vue';
 import MapHelper from './../../helpers/map';
 
-// Define props com tipagem
+// Props passed to the component
 const props = defineProps<{
     ship?: object;
 }>();
 
-// Refs to store the map instance and ship positions
+// Refs to store the map and ship positions
 const map = ref<maplibregl.Map | null>(null);
-const shipPositions = ref<any>(null); // Ref para armazenar posições do navio
+const shipPositions = ref<any>(null);
 
 // Function to fetch ship positions
-const fetchShipPositions = async (shipId: number, range: number) => {
+const fetchShipPositions = async (shipId: number, seconds: number) => {
     try {
-        const response = await axios.get(`/ships/${shipId}/lastPositions/${range}`);
+        const response = await axios.get(`/ships/${shipId}/last-positions/${seconds}`);
         shipPositions.value = response.data;
 
         // Check if the map and ship positions are available
@@ -36,7 +36,7 @@ const fetchShipPositions = async (shipId: number, range: number) => {
             });
         }
     } catch (error) {
-        console.error('Erro ao buscar as posições do navio:', error);
+        console.error('Error fetching ship positions:', error);
     }
 };
 

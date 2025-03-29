@@ -106,9 +106,13 @@ class ShipController extends Controller
     {
         $shipRealtimePosition = ShipRealtimePosition::where('ship_id', $ship->id)->latest()->first();
 
+        // Add to cargo_type_name and cargo_category_name to the ship object
+        $ship->cargo_type_name = $ship->cargoType->name;
+        $ship->cargo_category_name = $ship->cargoType->cargoCategory->name;
+        
         // Get all translations from the 'ship.php' file
         $translations = Lang::get('ship');
-
+        
         return Inertia::render('ship/Show', [
             'ship' => $ship,
             'shipRealtimePosition' => $shipRealtimePosition,

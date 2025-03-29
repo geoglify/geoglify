@@ -32,5 +32,6 @@ return [
     'longitude' => 'Longitude',
     'width' => 'Width',
     'length' => 'Length',
-    'cargo_name' => 'Cargo Name',
+    'cargo_type_name' => 'Cargo Type Name',
+    'cargo_category_name' => 'Cargo Category Name',
 ];

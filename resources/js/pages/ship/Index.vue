@@ -45,7 +45,7 @@ const breadcrumbs = [{ title: 'Ships', href: '/' }];
                     :class="{ 'bg-primary': Boolean(row.country_iso_code) }"
                     rounded
                 />
-                <Label class="mt-2">{{ row.country_name ?? 'N/A' }}</Label>
+                <Label class="mt-2">{{ row.country_name ?? 'Unknown' }}</Label>
             </div>
         </template>
 

@@ -7,7 +7,6 @@ use App\Http\Requests\UpdateShipRequest;
 use Inertia\Inertia;
 use App\Models\Ship;
 use App\Models\ShipHistoricalPosition;
-use App\Models\ShipRealtimePosition;
 use App\Models\ShipLatestPositionView;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Carbon;
@@ -104,20 +103,55 @@ class ShipController extends Controller
      */
     public function show(Ship $ship)
     {
-        $shipRealtimePosition = ShipRealtimePosition::where('ship_id', $ship->id)->latest()->first();
+        $status = $this->getShipStatus($ship);
 
-        // Add to cargo_type_name and cargo_category_name to the ship object
-        $ship->cargo_type_name = $ship->cargoType->name;
-        $ship->cargo_category_name = $ship->cargoType->cargoCategory->name;
-        
+        // Add cargo type and category names to the ship object
+        $this->addCargoInfo($ship);
+
         // Get all translations from the 'ship.php' file
         $translations = Lang::get('ship');
-        
+
         return Inertia::render('ship/Show', [
             'ship' => $ship,
-            'shipRealtimePosition' => $shipRealtimePosition,
+            'lastKnownPosition' => $ship->lastKnownPosition,
             'translations' => $translations,
+            'status' => $status,
         ]);
+    }
+
+    /**
+     * Get the ship's status based on its real-time position.
+     *
+     * @param Ship $ship
+     * @return string
+     */
+    private function getShipStatus(Ship $ship): string
+    {
+        $shipRealtimePosition = $ship->realtimePosition()->latest()->first();
+
+        // If no real-time position, use the latest historical position
+        if (!$shipRealtimePosition) {
+            $shipRealtimePosition = $ship->historicalPositions()
+                ->whereNotNull('longitude')
+                ->whereNotNull('latitude')
+                ->latest()
+                ->first();
+        }
+
+        return $shipRealtimePosition ? 'Offline' : 'Online';
+    }
+
+    /**
+     * Add cargo type and category names to the ship object.
+     *
+     * @param Ship $ship
+     */
+    private function addCargoInfo(Ship $ship): void
+    {
+        $ship->cargo_type_name = $ship->cargoType ? $ship->cargoType->name : 'Unknown';
+        $ship->cargo_category_name = $ship->cargoType && $ship->cargoType->cargoCategory
+            ? $ship->cargoType->cargoCategory->name
+            : 'Unknown';
     }
 
     /**
@@ -146,7 +180,7 @@ class ShipController extends Controller
 
     /**
      * Return the last positions of a ship in the last x seconds.
-     * 
+     *
      * @param Ship $ship
      * @param int $seconds
      * 
@@ -154,50 +188,13 @@ class ShipController extends Controller
      */
     public function lastPositions(Ship $ship, $seconds)
     {
-        $shipHistoricalPositions = ShipHistoricalPosition::where('ship_id', $ship->id)
-            ->whereNotNull('longitude')
-            ->whereNotNull('latitude')
-            ->where('last_updated', '>=', now()->subSeconds($seconds))
-            ->orderBy('last_updated', 'asc')
-            ->get();
+        $shipHistoricalPositions = $this->getShipHistoricalPositions($ship, $seconds);
 
         if ($shipHistoricalPositions->isEmpty()) {
             return response()->json(['message' => 'Ship not found or no positions in the requested range'], 404);
         }
 
-        $segments = [];
-        $previousPosition = null;
-
-        foreach ($shipHistoricalPositions as $position) {
-
-            $color = '#000000';
-
-            // Create new segment
-            if ($previousPosition) {
-                $segments[] = [
-                    'type' => 'Feature',
-                    'geometry' => [
-                        'type' => 'LineString',
-                        'coordinates' => [$previousPosition['coordinates'], [floatval($position->longitude), floatval($position->latitude)]],
-                    ],
-                    'properties' => [
-                        'cog' => $position->cog,
-                        'sog' => $position->sog,
-                        'hdg' => $position->hdg,
-                        'last_updated' => $position->last_updated,
-                        'color' => $color,
-                    ],
-                ];
-            }
-            $previousPosition = [
-                'coordinates' => [floatval($position->longitude), floatval($position->latitude)],
-                'cog' => $position->cog,
-                'sog' => $position->sog,
-                'hdg' => $position->hdg,
-                'last_updated' => $position->last_updated,
-                'legend' => 'SOG: ' . $position->sog . ' - Last Updated: ' . $position->last_updated
-            ];
-        }
+        $segments = $this->createSegments($shipHistoricalPositions);
 
         if (empty($segments)) {
             return response()->json(['message' => 'No valid segments found in the last ' . $seconds . ' seconds'], 404);
@@ -207,6 +204,95 @@ class ShipController extends Controller
             'type' => 'FeatureCollection',
             'features' => $segments
         ]);
+    }
+
+    /**
+     * Get the historical positions of the ship within the last x seconds.
+     *
+     * @param Ship $ship
+     * @param int $seconds
+     * @return \Illuminate\Support\Collection
+     */
+    private function getShipHistoricalPositions(Ship $ship, $seconds)
+    {
+        return ShipHistoricalPosition::where('ship_id', $ship->id)
+            ->whereNotNull('longitude')
+            ->whereNotNull('latitude')
+            ->where('last_updated', '>=', now()->subSeconds($seconds))
+            ->orderBy('last_updated', 'asc')
+            ->get();
+    }
+
+    /**
+     * Create segments from the historical positions.
+     *
+     * @param \Illuminate\Support\Collection $shipHistoricalPositions
+     * @return array
+     */
+    private function createSegments($shipHistoricalPositions)
+    {
+        $segments = [];
+        $previousPosition = null;
+
+        foreach ($shipHistoricalPositions as $position) {
+            $color = '#000000';
+
+            // Create new segment if there's a previous position
+            if ($previousPosition) {
+                $segments[] = $this->createSegment($previousPosition, $position, $color);
+            }
+
+            $previousPosition = $this->createPositionData($position);
+        }
+
+        return $segments;
+    }
+
+    /**
+     * Create a segment between two positions.
+     *
+     * @param array $previousPosition
+     * @param object $position
+     * @param string $color
+     * @return array
+     */
+    private function createSegment($previousPosition, $position, $color)
+    {
+        return [
+            'type' => 'Feature',
+            'geometry' => [
+                'type' => 'LineString',
+                'coordinates' => [
+                    $previousPosition['coordinates'],
+                    [floatval($position->longitude), floatval($position->latitude)]
+                ],
+            ],
+            'properties' => [
+                'cog' => $position->cog,
+                'sog' => $position->sog,
+                'hdg' => $position->hdg,
+                'last_updated' => $position->last_updated,
+                'color' => $color,
+            ],
+        ];
+    }
+
+    /**
+     * Create position data for a ship's historical position.
+     *
+     * @param object $position
+     * @return array
+     */
+    private function createPositionData($position)
+    {
+        return [
+            'coordinates' => [floatval($position->longitude), floatval($position->latitude)],
+            'cog' => $position->cog,
+            'sog' => $position->sog,
+            'hdg' => $position->hdg,
+            'last_updated' => $position->last_updated,
+            'legend' => 'SOG: ' . $position->sog . ' - Last Updated: ' . $position->last_updated,
+        ];
     }
 
     /**

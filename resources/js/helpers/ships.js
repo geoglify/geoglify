@@ -9,7 +9,7 @@ export default {
         return {
             id: ship.id, // Ship's ID
             mmsi: ship.mmsi, // Ship's MMSI (Maritime Mobile Service Identity)
-            name: ship.name || 'N/A', // Ship's name or "N/A" if not available
+            name: ship.name || 'Unknown', // Ship's name or "Unknown" if not available
             color: ship.cargo_category_color || DEFAULT_COLOR, // Ship's color based on cargo category or default color
             hdg: ship.hdg || 511, // Ship's heading or 511 (default value for unknown heading)
             image: ship.hdg && ship.hdg !== 511 ? 'shipIcon' : 'circleIcon', // Icon to use based on heading

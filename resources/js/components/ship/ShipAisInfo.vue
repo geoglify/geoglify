@@ -2,16 +2,16 @@
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 
 defineProps<{
-    shipRealtimePosition?: object;
+    lastKnownPosition?: object;
 }>();
 </script>
 
 <template>
     <Table>
         <TableBody>
-            <TableRow v-for="(attribute, key) in shipRealtimePosition" :key="key">
+            <TableRow v-for="(attribute, key) in lastKnownPosition" :key="key">
                 <TableCell class="font-medium">{{ attribute.label }}</TableCell>
-                <TableCell>{{ attribute.value ?? 'N/A' }}</TableCell>
+                <TableCell>{{ attribute.value ?? 'Unknown' }}</TableCell>
             </TableRow>
         </TableBody>
     </Table>

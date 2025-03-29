@@ -9,10 +9,11 @@ return [
     'card_ais_title' => 'AIS Information',
     'card_ais_description' => 'All information about AIS',
     
-    'card_photo_title' => 'Ship Photo (provided by MarineTraffic)',
+    'card_photo_title' => 'Ship Photo',
     'card_photo_description' => 'Photo of the ship',
     
     'no_photo_available' => 'No photo available',
+    'no_ais_data_available' => 'No AIS data available',
 
     'id' => 'ID',
     'mmsi' => 'MMSI',

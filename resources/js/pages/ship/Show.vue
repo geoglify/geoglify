@@ -3,41 +3,44 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 // Import the components
 import ShipAisInfo from '../../components/ship/ShipAisInfo.vue';
 import ShipDetails from '../../components/ship/ShipDetails.vue';
 import ShipHistoryMap from '../../components/ship/ShipHistoryMap.vue';
 
+const props = defineProps<{
+    ship?: Record<string, any>;
+    lastKnownPosition?: Record<string, any>;
+    translations: Record<string, string>;
+}>();
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Ships',
+        title: 'Ships / ' + props.ship.name,
         href: '/',
     },
 ];
 
-const props = defineProps<{
-    ship?: Record<string, any>;
-    shipRealtimePosition?: Record<string, any>;
-    translations: Record<string, string>;
-}>();
+// State
+const imageError = ref(false);
 
 // Compute the ship details
 const shipDetails = computed(() => {
     if (!props.ship) return [];
     return Object.entries(props.ship).map(([key, value]) => ({
         label: props.translations[key] || key, // Use the translation from Laravel or the original key
-        value: value ?? 'N/A', // Replace null values with 'N/A'
+        value: value ?? 'Unknown', // Replace null values with 'Unknown'
     }));
 });
 
 // Compute the ship realtime position
-const shipRealtimePositionDetails = computed(() => {
-    if (!props.shipRealtimePosition) return [];
-    return Object.entries(props.shipRealtimePosition).map(([key, value]) => ({
+const lastKnownPositionDetails = computed(() => {
+    if (!props.lastKnownPosition) return [];
+    return Object.entries(props.lastKnownPosition).map(([key, value]) => ({
         label: props.translations[key] || key, // Use the translation from Laravel or the original key
-        value: value ?? 'N/A', // Replace null values with 'N/A'
+        value: value ?? 'Unknown', // Replace null values with 'Unknown'
     }));
 });
 
@@ -54,7 +57,7 @@ const handleImageError = () => {
 </script>
 
 <template>
-    <Head title="Ship" />
+    <Head :title="props.ship.name" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex flex-1 flex-col gap-4 p-4 pt-4">
@@ -64,10 +67,16 @@ const handleImageError = () => {
                     <CardHeader>
                         <CardTitle>{{ $t('ship.card_photo_title') }}</CardTitle>
                     </CardHeader>
-                    <CardContent class="flex flex-1 flex-col">
-                        <div class="flex max-h-[300px] flex-1 items-center justify-center overflow-hidden">
-                            <img v-if="shipPhotoUrl" :src="shipPhotoUrl" alt="Ship Photo" class="h-full w-full" />
-                            <div v-else class="p-4 text-center text-gray-400">
+                    <CardContent class="flex-1">
+                        <div class="flex max-h-[400px] flex-1 items-center justify-center overflow-hidden">
+                            <img
+                                v-if="!imageError && shipPhotoUrl"
+                                :src="shipPhotoUrl"
+                                alt="Ship Photo"
+                                class="h-full w-full object-cover"
+                                @error="handleImageError"
+                            />
+                            <div v-else class="flex min-h-[300px] items-center justify-center p-4 text-center text-gray-400">
                                 {{ $t('ship.no_photo_available') }}
                             </div>
                         </div>
@@ -88,7 +97,10 @@ const handleImageError = () => {
                         <CardTitle>{{ $t('ship.card_ais_title') }}</CardTitle>
                     </CardHeader>
                     <CardContent class="flex-1">
-                        <ShipAisInfo :shipRealtimePosition="shipRealtimePositionDetails" />
+                        <ShipAisInfo :lastKnownPosition="lastKnownPositionDetails" v-if="lastKnownPositionDetails.length" />
+                        <div v-else class="flex min-h-[300px] items-center justify-center p-4 text-center text-gray-400">
+                            {{ $t('ship.no_ais_data_available') }}
+                        </div>
                     </CardContent>
                 </Card>
             </div>

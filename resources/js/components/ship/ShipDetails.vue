@@ -11,7 +11,7 @@ defineProps<{
         <TableBody>
             <TableRow v-for="(attribute, key) in ship" :key="key">
                 <TableCell class="font-medium">{{ attribute.label }}</TableCell>
-                <TableCell>{{ attribute.value ?? 'N/A' }}</TableCell>
+                <TableCell>{{ attribute.value ?? 'Unknown' }}</TableCell>
             </TableRow>
         </TableBody>
     </Table>

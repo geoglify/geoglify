@@ -115,7 +115,7 @@ const table = useVueTable({
                             <TableRow v-for="row in data.data" :key="row.id">
                                 <TableCell v-for="column in columns" :key="column.accessorKey">
                                     <slot :name="`cell-${column.accessorKey}`" :row="row" :value="row[column.accessorKey as string]">
-                                        {{ row[column.accessorKey as string] || 'N/A' }}
+                                        {{ row[column.accessorKey as string] || 'Unknown' }}
                                     </slot>
                                 </TableCell>
                             </TableRow>

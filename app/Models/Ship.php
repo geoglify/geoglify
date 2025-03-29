@@ -12,7 +12,7 @@ class Ship extends Model
     /**
      * Append the following attributes to the response.
      */
-    protected $appends = ['width', 'length'];
+    protected $appends = ['width', 'length', 'status'];
 
     /**
      * The attributes that are mass assignable.
@@ -29,7 +29,6 @@ class Ship extends Model
         'imo',
         'callsign',
         'draught',
-        'imo',
         'cargo_type_id'
     ];
 
@@ -47,7 +46,10 @@ class Ship extends Model
         'dim_c',
         'dim_d',
         'cargo_type_id',
-        'cargoType'
+        'cargoType',
+        'lastKnownPosition',
+        'lastRealtimePosition',
+        'status'
     ];
 
     /**
@@ -75,19 +77,27 @@ class Ship extends Model
     }
 
     /**
-     * Get the latest position of the ship.
+     * Get the latest historical position of the ship.
      */
     public function latestPosition()
     {
         return $this->hasOne(ShipHistoricalPosition::class)->latest();
     }
-    
+
     /**
-     * Get the last realtime position of the ship.
+     * Get the last real-time position of the ship.
      */
     public function lastRealtimePosition()
     {
         return $this->hasOne(ShipRealtimePosition::class)->latest();
+    }
+    
+    /**
+     * Get the last known position of the ship (realtime or historical).
+     */
+    public function lastKnownPosition()
+    {
+        return $this->hasOne(ShipRealtimePosition::class)->latest()->union($this->hasOne(ShipHistoricalPosition::class)->latest());
     }
 
     /**
@@ -113,12 +123,21 @@ class Ship extends Model
     {
         return (int) substr($this->mmsi, 0, 3);
     }
-    
+
     /**
-     * Get status of the ship.
+     * Get the status of the ship (LIVE if real-time position exists, OFFLINE otherwise).
      */
     public function getStatusAttribute()
     {
+        // Verifica se a posição em tempo real está disponível
         return $this->lastRealtimePosition ? 'LIVE' : 'OFFLINE';
+    }
+
+    /**
+     * Get the real-time position of the ship.
+     */
+    public function realtimePosition()
+    {
+        return $this->hasOne(ShipRealtimePosition::class);
     }
 }

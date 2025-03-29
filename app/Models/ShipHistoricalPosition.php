@@ -25,4 +25,17 @@ class ShipHistoricalPosition extends Model
         'latitude',
         'longitude'
     ];
+    
+    /**
+     * Hide the following attributes from the response.
+     * 
+     * @var array<int, string>
+     */
+    public $hidden = [
+        'id',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'ship_id'
+    ];
 }

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DatePicker from '@/components/Datepicker.vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
@@ -110,6 +111,8 @@ const handleImageError = () => {
             <Card class="flex h-full flex-col">
                 <CardHeader>
                     <CardTitle>Map Positions</CardTitle>
+
+                    <DatePicker />
                 </CardHeader>
                 <CardContent class="flex-1">
                     <ShipHistoryMap :ship="ship" :startDate="startDate" :endDate="endDate" />

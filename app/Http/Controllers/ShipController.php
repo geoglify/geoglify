@@ -9,9 +9,9 @@ use App\Models\Ship;
 use App\Models\ShipHistoricalPosition;
 use App\Models\ShipLatestPositionView;
 use Illuminate\Support\Facades\Lang;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class ShipController extends Controller
 {
@@ -196,10 +196,12 @@ class ShipController extends Controller
         $startDate = Carbon::createFromFormat('Y-m-d', $startDate);
         $endDate = Carbon::createFromFormat('Y-m-d', $endDate);
         
+        // Check if the dates are valid
         if (!$startDate || !$endDate) {
             return response()->json(['message' => 'Invalid date format'], 400);
         }
         
+        // 
         $shipHistoricalPositions = $this->getShipHistoricalPositions($ship, $startDate, $endDate);
 
         if ($shipHistoricalPositions->isEmpty()) {
@@ -222,15 +224,16 @@ class ShipController extends Controller
      * Get the historical positions of the ship within the last x seconds.
      *
      * @param Ship $ship
-     * @param int $seconds
+     * @param DateTime $startDate
+     * @param DateTime $endDate
      * @return \Illuminate\Support\Collection
      */
-    private function getShipHistoricalPositions(Ship $ship, $seconds)
+    private function getShipHistoricalPositions(Ship $ship, $startDate, $endDate)
     {
         return ShipHistoricalPosition::where('ship_id', $ship->id)
             ->whereNotNull('longitude')
             ->whereNotNull('latitude')
-            ->where('last_updated', '>=', now()->subSeconds($seconds))
+            ->whereBetween('last_updated', [$startDate, $endDate])
             ->orderBy('last_updated', 'asc')
             ->get();
     }

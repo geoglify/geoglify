@@ -9,7 +9,12 @@ import MapHelper from './../../helpers/map';
 
 // Props passed to the component
 const props = defineProps<{
-    ship?: object;
+    ship?: {
+        id: number;
+        name: string;
+    };
+    startDate?: string;
+    endDate?: string;
 }>();
 
 // Refs to store the map and ship positions
@@ -17,9 +22,20 @@ const map = ref<maplibregl.Map | null>(null);
 const shipPositions = ref<any>(null);
 
 // Function to fetch ship positions
-const fetchShipPositions = async (shipId: number, seconds: number) => {
+const fetchShipPositions = async (shipId: number, startDate: string, endDate: string) => {
     try {
-        const response = await axios.get(`/ships/${shipId}/last-positions/${seconds}`);
+        const response = await axios.post(`/ships/${shipId}/last-positions`, {
+            startDate,
+            endDate,
+        });
+        
+        // Check if the response is valid
+        if (!response.data || !response.data.features) {
+            console.error('Invalid response data:', response.data);
+            return;
+        }
+        
+        // Set the ship positions
         shipPositions.value = response.data;
 
         // Check if the map and ship positions are available
@@ -76,16 +92,20 @@ onMounted(() => {
 
         const isDarkMode = localStorage.getItem('appearance') === 'dark';
 
+        // Create the map
         map.value = MapHelper.createMap('map', center, zoom, bearing, isDarkMode) as maplibregl.Map;
 
+        // Add map controls
         map.value.on('load', () => {
+            
             // Add the ship positions source
             createShipPositionsSource();
 
             // Check if the ship has an ID
-            if (props.ship?.id) {
-                const rangeSeconds = 60 * 60 * 7; // 7 hours
-                fetchShipPositions(props.ship.id, rangeSeconds);
+            if (props.ship?.id && props.startDate && props.endDate) {
+                
+                // Fetch ship positions
+                fetchShipPositions(props.ship.id, props.startDate, props.endDate);
             }
         });
     }

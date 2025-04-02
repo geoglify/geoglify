@@ -14,7 +14,7 @@ Route::resource('dashboard', DashboardController::class)->middleware(['auth', 'v
 Route::resource('ships', ShipController::class)->middleware(['auth', 'verified']);
 
 // Ship last position route
-Route::get('ships/{ship}/last-positions/{seconds}', [ShipController::class, 'lastPositions'])->middleware(['auth', 'verified']);
+Route::post('ships/{ship}/last-positions', [ShipController::class, 'lastPositions'])->middleware(['auth', 'verified']);
 
 // Grouping real-time ship-related routes under a common prefix
 Route::prefix('realtime/ships')->middleware(['auth', 'verified'])->group(function () {

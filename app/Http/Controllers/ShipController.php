@@ -186,9 +186,21 @@ class ShipController extends Controller
      * 
      * @return \Illuminate\Http\JsonResponse
      */
-    public function lastPositions(Ship $ship, $seconds)
+    public function lastPositions(Ship $ship, Request $request)
     {
-        $shipHistoricalPositions = $this->getShipHistoricalPositions($ship, $seconds);
+        // Get start and end dates from the request
+        $startDate = $request->input('startDate');
+        $endDate = $request->input('endDate');
+        
+        // Validate the date format
+        $startDate = Carbon::createFromFormat('Y-m-d', $startDate);
+        $endDate = Carbon::createFromFormat('Y-m-d', $endDate);
+        
+        if (!$startDate || !$endDate) {
+            return response()->json(['message' => 'Invalid date format'], 400);
+        }
+        
+        $shipHistoricalPositions = $this->getShipHistoricalPositions($ship, $startDate, $endDate);
 
         if ($shipHistoricalPositions->isEmpty()) {
             return response()->json(['message' => 'Ship not found or no positions in the requested range'], 404);

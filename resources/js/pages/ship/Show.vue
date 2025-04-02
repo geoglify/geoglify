@@ -25,6 +25,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 // State
 const imageError = ref(false);
+const startDate = ref('2023-01-01');
+const endDate = ref('2023-12-31');
 
 // Compute the ship details
 const shipDetails = computed(() => {
@@ -110,7 +112,7 @@ const handleImageError = () => {
                     <CardTitle>Map Positions</CardTitle>
                 </CardHeader>
                 <CardContent class="flex-1">
-                    <ShipHistoryMap :ship="ship" />
+                    <ShipHistoryMap :ship="ship" :startDate="startDate" :endDate="endDate" />
                 </CardContent>
             </Card>
         </div>

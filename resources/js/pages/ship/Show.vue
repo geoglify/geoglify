@@ -64,7 +64,7 @@ const handleImageError = () => {
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex flex-1 flex-col gap-4 p-4 pt-4">
-            <div class="grid gap-2 lg:grid-cols-3">
+            <div class="grid gap-2 md:grid-cols-3">
                 <!-- Ship Photo by MarineTraffic -->
                 <Card class="flex h-full flex-col">
                     <CardHeader>
@@ -109,13 +109,12 @@ const handleImageError = () => {
             </div>
 
             <Card class="flex h-full flex-col">
-                <CardHeader>
+                <CardHeader class="flex flex-row items-center justify-between">
                     <CardTitle>Map Positions</CardTitle>
-
                     <DatePicker />
                 </CardHeader>
                 <CardContent class="flex-1">
-                    <ShipHistoryMap :ship="ship" :startDate="startDate" :endDate="endDate" />
+                    <ShipHistoryMap ship="{ship}" startDate="{startDate}" endDate="{endDate}" />
                 </CardContent>
             </Card>
         </div>

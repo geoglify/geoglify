@@ -28,7 +28,6 @@
         "@headlessui/vue": "^1.7.23",
         "@inertiajs/vue3": "^2.0.0-beta.3",
         "@mapbox/mapbox-gl-draw": "^1.5.0",
-        "@radix-ui/react-slot": "^1.1.2",
         "@tailwindcss/forms": "^0.5.3",
         "@tanstack/vue-table": "^8.21.2",
         "@turf/turf": "^7.2.0",

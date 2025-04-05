@@ -48,7 +48,8 @@ class Ship extends Model
         'cargo_type_id',
         'cargoType',
         'lastKnownPosition',
-        'lastRealtimePosition'
+        'lastRealtimePosition',
+        'geom'
     ];
 
     /**

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import DatePicker from '@/components/Datepicker.vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
@@ -33,6 +34,11 @@ sevenDaysAgo.setDate(today.getDate() - 7);
 const imageError = ref(false);
 const startDate = ref(sevenDaysAgo.toISOString().split('T')[0]); // YYYY-MM-DD format
 const endDate = ref(today.toISOString().split('T')[0]); // YYYY-MM-DD format
+const mapType = ref('lines'); // Default map type
+const mapTypeOptions = [
+    { value: 'lines', label: 'Lines' },
+    { value: 'grid', label: 'Grid' },
+];
 
 // Compute the ship details
 const shipDetails = computed(() => {
@@ -116,10 +122,20 @@ const handleImageError = () => {
             <Card class="flex h-full flex-col">
                 <CardHeader class="flex flex-row items-center justify-between">
                     <CardTitle>Map Positions</CardTitle>
-                    <DatePicker :startDate="startDate" :endDate="endDate" @update:startDate="startDate = $event" @update:endDate="endDate = $event" />
+                    
+                    <div class="flex flex-1 justify-end">
+                        <DatePicker :startDate="startDate" :endDate="endDate" @update:startDate="startDate = $event" @update:endDate="endDate = $event"/>
+                        
+                        <ToggleGroup type="single" variant="outline" value="lines" :defaultValue="mapType" class="ml-4">
+                            <ToggleGroupItem v-for="type in mapTypeOptions" :key="type.value" :value="type.value" @click="mapType = type.value">
+                                {{ type.label }}
+                            </ToggleGroupItem>
+                        </ToggleGroup>
+                    </div>
+                    
                 </CardHeader>
                 <CardContent class="flex-1">
-                    <ShipHistoryMap :ship="ship" :startDate="startDate" :endDate="endDate" />
+                    <ShipHistoryMap :ship="ship" :mapType="mapType" :startDate="startDate" :endDate="endDate" />
                 </CardContent>
             </Card>
         </div>

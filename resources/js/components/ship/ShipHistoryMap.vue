@@ -4,7 +4,7 @@ import axios from 'axios';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-theme/classic.css';
 import 'maplibre-theme/icons.lucide.css';
-import { defineProps, onMounted, ref } from 'vue';
+import { defineProps, onMounted, ref, watch } from 'vue';
 import MapHelper from './../../helpers/map';
 
 // Props passed to the component
@@ -12,6 +12,7 @@ const props = defineProps<{
     ship?: any;
     startDate?: string;
     endDate?: string;
+    mapType?: string;
 }>();
 
 // Refs to store the map and ship positions
@@ -19,9 +20,10 @@ const map = ref<maplibregl.Map | null>(null);
 const shipPositions = ref<any>(null);
 
 // Function to fetch ship positions
-const fetchShipPositions = async (shipId: number, startDate: string, endDate: string) => {
+const fetchShipPositions = async (shipId: number, startDate: string, endDate: string, mapType: string) => {
     try {
         const response = await axios.post(`/ships/${shipId}/last-positions`, {
+            mapType,
             startDate,
             endDate,
         });
@@ -74,7 +76,7 @@ const createShipPositionsSource = () => {
             },
             paint: {
                 'line-color': '#000000',
-                'line-width': 2,
+                'line-width': 5,
             },
         });
     }
@@ -105,6 +107,22 @@ onMounted(() => {
                 fetchShipPositions(props.ship.id, props.startDate, props.endDate);
             }
         });
+    }
+});
+
+// Watch for changes in the ship ID, start date, end date, and map type
+watch(() => [props.startDate, props.endDate, props.mapType], ([startDate, endDate, mapType]) => {
+    
+    // Clear previous ship positions
+    if (map.value) {
+        map.value.getSource('shipPositions')?.setData({
+            type: 'FeatureCollection',
+            features: [],
+        });
+    }
+    
+    if (props.ship?.id && !!startDate && !!endDate) {
+        fetchShipPositions(props.ship.id, startDate, endDate, mapType);
     }
 });
 </script>

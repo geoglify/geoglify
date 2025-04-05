@@ -36,6 +36,7 @@ class ShipRealtimePosition extends Model
         'created_at',
         'updated_at',
         'deleted_at',
-        'ship_id'
+        'ship_id',
+        'geom'
     ];
 }

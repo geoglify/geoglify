@@ -12,7 +12,7 @@ import ShipDetails from '../../components/ship/ShipDetails.vue';
 import ShipHistoryMap from '../../components/ship/ShipHistoryMap.vue';
 
 const props = defineProps<{
-    ship?: Record<string, any>;
+    ship?: any;
     lastKnownPosition?: Record<string, any>;
     translations: Record<string, string>;
 }>();
@@ -24,10 +24,15 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+// Set start date to 7 days ago and end date to today
+const today = new Date();
+const sevenDaysAgo = new Date();
+sevenDaysAgo.setDate(today.getDate() - 7);
+
 // State
 const imageError = ref(false);
-const startDate = ref('2023-01-01');
-const endDate = ref('2023-12-31');
+const startDate = ref(sevenDaysAgo.toISOString().split('T')[0]); // YYYY-MM-DD format
+const endDate = ref(today.toISOString().split('T')[0]); // YYYY-MM-DD format
 
 // Compute the ship details
 const shipDetails = computed(() => {
@@ -111,10 +116,10 @@ const handleImageError = () => {
             <Card class="flex h-full flex-col">
                 <CardHeader class="flex flex-row items-center justify-between">
                     <CardTitle>Map Positions</CardTitle>
-                    <DatePicker />
+                    <DatePicker :startDate="startDate" :endDate="endDate" @update:startDate="startDate = $event" @update:endDate="endDate = $event" />
                 </CardHeader>
                 <CardContent class="flex-1">
-                    <ShipHistoryMap ship="{ship}" startDate="{startDate}" endDate="{endDate}" />
+                    <ShipHistoryMap :ship="ship" :startDate="startDate" :endDate="endDate" />
                 </CardContent>
             </Card>
         </div>

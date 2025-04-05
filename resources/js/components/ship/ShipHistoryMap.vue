@@ -9,10 +9,7 @@ import MapHelper from './../../helpers/map';
 
 // Props passed to the component
 const props = defineProps<{
-    ship?: {
-        id: number;
-        name: string;
-    };
+    ship?: any;
     startDate?: string;
     endDate?: string;
 }>();

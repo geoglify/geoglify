@@ -132,7 +132,7 @@ export default {
             layout: {
                 'text-field': ['get', 'name'], // Display the ship's name
                 'text-font': ['Open Sans Bold'], // Set font
-                'text-size': 12, // Set text size
+                'text-size': 14, // Set text size
                 'text-anchor': 'center', // Center the text
                 'text-offset': [0, 0], // No offset
             },

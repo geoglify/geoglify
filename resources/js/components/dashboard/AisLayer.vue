@@ -24,6 +24,9 @@ export default {
 
         // Listen for real-time ship position updates
         window.Echo.channel('ships.latest_positions').listen('ShipsLatestPositionsUpdated', (data) => {
+            
+            console.log('count:', data.length);
+            
             if (this.isMapInteracting) {
                 // Loop through incoming ship data
                 data.forEach((newShip) => {
@@ -38,6 +41,10 @@ export default {
                         this.tempShipUpdates.push(newShip);
                     }
                 });
+                
+                //size of data and size of tempShipUpdates
+                console.log(`Data size: ${data.length}, Temp updates size: ${this.tempShipUpdates.length}`);
+                
             } else {
                 // If the map is not being interacted with, update the map immediately
                 data.forEach((ship) => {
@@ -115,6 +122,7 @@ export default {
             }
 
             try {
+                
                 this.data.forEach((ship) => {
                     store.dispatch('addOrUpdateShip', ship);
                 });
@@ -140,7 +148,7 @@ export default {
             const now = Date.now();
             const delta = now - this.lastUpdate;
 
-            if (delta >= 1000 && !this.isMapInteracting) {
+            if (delta >= 1000 && !this.isMapInteracting) {                
                 this.updateSource();
                 this.lastUpdate = now;
             }

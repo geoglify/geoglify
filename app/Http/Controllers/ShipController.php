@@ -231,7 +231,7 @@ class ShipController extends Controller
                 ) AS point_count
             FROM 
                 ST_HexagonGrid(
-                    0.001,  -- Tamanho do hexágono em graus
+                    0.01,  -- Tamanho do hexágono em graus
                     ST_SetSRID(ST_MakeEnvelope(?, ?, ?, ?, 4326), 4326)
                 ) AS hex
             WHERE 

@@ -27,13 +27,13 @@ const fetchShipPositions = async (shipId: number, startDate: string, endDate: st
             startDate,
             endDate,
         });
-        
+
         // Check if the response is valid
         if (!response.data || !response.data.features) {
             console.error('Invalid response data:', response.data);
             return;
         }
-        
+
         // Set the ship positions
         shipPositions.value = response.data;
 
@@ -56,7 +56,7 @@ const fetchShipPositions = async (shipId: number, startDate: string, endDate: st
 };
 
 // Create the ship positions source
-const createShipPositionsSource = () => {
+const createShipPositionsSource = (mapType?: string) => {
     if (map.value) {
         map.value.addSource('shipPositions', {
             type: 'geojson',
@@ -66,19 +66,36 @@ const createShipPositionsSource = () => {
             },
         });
 
-        map.value.addLayer({
-            id: 'shipPositions',
-            type: 'line',
-            source: 'shipPositions',
-            layout: {
-                'line-join': 'round',
-                'line-cap': 'round',
-            },
-            paint: {
-                'line-color': '#000000',
-                'line-width': 5,
-            },
-        });
+        // Add the lines layer if mapType is 'lines'
+        if (mapType === 'lines') {
+            map.value.addLayer({
+                id: 'shipPositions',
+                type: 'line',
+                source: 'shipPositions',
+                layout: {
+                    'line-join': 'round',
+                    'line-cap': 'round',
+                },
+                paint: {
+                    'line-color': '#000000',
+                    'line-width': 2,
+                },
+            });
+        }
+
+        // Add the polygon layer if mapType is 'grid' and use property color from each feature
+        if (mapType === 'grid') {
+            map.value.addLayer({
+                id: 'shipPositions',
+                type: 'fill',
+                source: 'shipPositions',
+                layout: {},
+                paint: {
+                    'fill-color': ['case', ['==', ['get', 'color'], '#000000'], '#000000', '#FF0000'],
+                    'fill-opacity': 0.5,
+                },
+            });
+        }
     }
 };
 
@@ -96,13 +113,11 @@ onMounted(() => {
 
         // Add map controls
         map.value.on('load', () => {
-            
             // Add the ship positions source
-            createShipPositionsSource();
+            createShipPositionsSource(props.mapType);
 
             // Check if the ship has an ID
             if (props.ship?.id && props.startDate && props.endDate) {
-                
                 // Fetch ship positions
                 fetchShipPositions(props.ship.id, props.startDate, props.endDate);
             }
@@ -111,20 +126,22 @@ onMounted(() => {
 });
 
 // Watch for changes in the ship ID, start date, end date, and map type
-watch(() => [props.startDate, props.endDate, props.mapType], ([startDate, endDate, mapType]) => {
-    
-    // Clear previous ship positions
-    if (map.value) {
-        map.value.getSource('shipPositions')?.setData({
-            type: 'FeatureCollection',
-            features: [],
-        });
-    }
-    
-    if (props.ship?.id && !!startDate && !!endDate) {
-        fetchShipPositions(props.ship.id, startDate, endDate, mapType);
-    }
-});
+watch(
+    () => [props.startDate, props.endDate, props.mapType],
+    ([startDate, endDate, mapType]) => {
+        // Clear previous ship positions
+        if (map.value) {
+            map.value.getSource('shipPositions')?.setData({
+                type: 'FeatureCollection',
+                features: [],
+            });
+        }
+
+        if (props.ship?.id && !!startDate && !!endDate) {
+            fetchShipPositions(props.ship.id, startDate, endDate, mapType);
+        }
+    },
+);
 </script>
 
 <template>

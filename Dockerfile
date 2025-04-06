@@ -14,12 +14,16 @@ RUN apk --no-cache add \
 # Install PHP extensions
 RUN set -ex \
     && apk --no-cache add \
-      postgresql-dev
+    postgresql-dev
 
 # Install LDAP extension
 RUN apk update \
     && apk add --no-cache openldap-dev \
     && docker-php-ext-install ldap
+
+# Install Redis extension
+RUN git clone https://github.com/phpredis/phpredis.git /usr/src/php/ext/redis
+RUN docker-php-ext-install redis
 
 # Install PCNTL extension (for Laravel Reverb)
 RUN docker-php-ext-install pcntl

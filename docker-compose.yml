@@ -15,12 +15,15 @@ services:
             - .:/var/www/webapp
             - node-modules-data:/var/www/webapp/node_modules
             - vendor-data:/var/www/webapp/vendor
+        depends_on:
+            - database
+            - redis
         healthcheck:
             test: [ 'CMD', 'curl', '-f', 'http://webapp/' ]
             interval: 30s
             timeout: 10s
             retries: 3
-    
+
     database:
         image: pgrouting/pgrouting:16-3.4-3.6.1
         restart: always
@@ -33,6 +36,19 @@ services:
             POSTGRES_DB: geoglify
             POSTGRES_USER: dbadmin
             POSTGRES_PASSWORD: geoglify2024
+
+    redis:
+        image: redis:latest
+        restart: always
+        container_name: gredis
+        ports:
+            - '6379:6379'
+        healthcheck:
+            test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+            interval: 1s
+            timeout: 3s
+            retries: 5
+        command: [ "redis-server" ]
 
 volumes:
     vendor-data:

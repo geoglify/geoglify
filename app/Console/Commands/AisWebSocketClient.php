@@ -74,7 +74,7 @@ class AisWebSocketClient extends Command
             $this->processAisMessage($data);
 
             // Check if 5 seconds have passed since the last dispatch
-            if ($lastDispatchTime->diffInSeconds(Carbon::now()) >= 1) {
+            if ($lastDispatchTime->diffInSeconds(Carbon::now()) >= 5) {
 
                 // Log the dispatch
                 $this->info("AIS Data Dispatched: " . count($this->shipsData) . " ships");

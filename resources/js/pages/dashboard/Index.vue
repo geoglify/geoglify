@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import AisShipsMap from '../../components/dashboard/AisShipsMap.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
+import AisShipsMap from '../../components/dashboard/AisShipsMap.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Dashboard',
+        title: 'Map',
         href: '/',
     },
 ];
@@ -17,7 +17,7 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Dashboard" />
+    <Head title="Map" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <AisShipsMap :ships="ships" />

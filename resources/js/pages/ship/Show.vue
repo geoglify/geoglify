@@ -79,7 +79,7 @@ const handleImageError = () => {
                 <!-- Ship Photo by MarineTraffic -->
                 <Card class="flex h-full flex-col">
                     <CardHeader>
-                        <CardTitle>{{ $t('ship.card_photo_title') }}</CardTitle>
+                        <CardTitle>{{ props.ship.name }}</CardTitle>
                     </CardHeader>
                     <CardContent class="flex-1">
                         <div class="flex max-h-[400px] flex-1 items-center justify-center overflow-hidden">
@@ -122,17 +122,27 @@ const handleImageError = () => {
             <Card class="flex h-full flex-col">
                 <CardHeader class="flex flex-row items-center justify-between">
                     <CardTitle>Map Positions</CardTitle>
-                    
+
                     <div class="flex flex-1 justify-end">
-                        <DatePicker :startDate="startDate" :endDate="endDate" @update:startDate="startDate = $event" @update:endDate="endDate = $event"/>
-                        
+                        <DatePicker
+                            :startDate="startDate"
+                            :endDate="endDate"
+                            @update:startDate="startDate = $event"
+                            @update:endDate="endDate = $event"
+                        />
+
                         <ToggleGroup type="single" variant="outline" value="lines" :defaultValue="mapType" class="ml-4">
-                            <ToggleGroupItem v-for="type in mapTypeOptions" :key="type.value" :value="type.value" @click="mapType = type.value">
+                            <ToggleGroupItem
+                                v-for="type in mapTypeOptions"
+                                :key="type.value"
+                                :value="type.value"
+                                @click="mapType = type.value"
+                                :class="{ 'bg-primary text-white': mapType === type.value }"
+                            >
                                 {{ type.label }}
                             </ToggleGroupItem>
                         </ToggleGroup>
                     </div>
-                    
                 </CardHeader>
                 <CardContent class="flex-1">
                     <ShipHistoryMap :ship="ship" :mapType="mapType" :startDate="startDate" :endDate="endDate" />

@@ -40,6 +40,12 @@ const fetchShipPositions = async (shipId: number, startDate: string, endDate: st
         // Check if the map and ship positions are available
         if (map.value && shipPositions.value) {
             const geoJsonData = shipPositions.value;
+            
+            if(!geoJsonData.features || geoJsonData.features.length === 0) {
+                console.warn('No ship positions found for the given date range.');
+                return;
+            }
+            
             map.value.getSource('shipPositions')?.setData(geoJsonData);
 
             // Find Bounding Box Of LineString

@@ -1,5 +1,4 @@
 <script lang="ts">
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import 'maplibre-theme/classic.css';
 import 'maplibre-theme/icons.lucide.css';
 import { mapActions, mapState } from 'vuex';
@@ -9,11 +8,6 @@ import ShipLayer from './AisLayer.vue';
 export default {
     components: {
         ShipLayer,
-        Card,
-        CardContent,
-        CardDescription,
-        CardHeader,
-        CardTitle,
     },
 
     props: {

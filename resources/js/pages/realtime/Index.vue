@@ -2,11 +2,11 @@
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import AisShipsMap from '../../components/dashboard/AisShipsMap.vue';
+import AisShipsMap from '../../components/realtime/AisShipsMap.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Map',
+        title: 'Realtime Map',
         href: '/',
     },
 ];
@@ -17,7 +17,7 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Map" />
+    <Head title="Realtime Map" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <AisShipsMap :ships="ships" />

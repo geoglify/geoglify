@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ShipLatestPositionView;
 use Inertia\Inertia;
 
-class DashboardController extends Controller
+class TrafficController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,7 +14,7 @@ class DashboardController extends Controller
     {
         $ships = ShipLatestPositionView::all();
         
-        return Inertia::render('dashboard/Index', [
+        return Inertia::render('traffic/Index', [
             'ships' => $ships,
         ]);
     }

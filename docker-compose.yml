@@ -1,6 +1,6 @@
 services:
     webapp:
-        build: .
+        build: ./
         image: geoglify/webapp
         container_name: gwebapp
         restart: always
@@ -12,7 +12,7 @@ services:
             - 8080:8080
             - 5173:5173
         volumes:
-            - .:/var/www/webapp
+            - ./:/var/www/webapp
             - node-modules-data:/var/www/webapp/node_modules
             - vendor-data:/var/www/webapp/vendor
         depends_on:

@@ -5,7 +5,7 @@ services:
         container_name: gwebapp
         restart: always
         environment:
-            PHP_OPCACHE_ENABLE: 0
+            PHP_OPCACHE_ENABLE: 1
             PRODUCTION: 0
         ports:
             - 8081:80

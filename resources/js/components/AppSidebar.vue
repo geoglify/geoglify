@@ -11,12 +11,12 @@ import AppLogo from './AppLogo.vue';
 const mainNavItems: NavItem[] = [
     {
         title: 'Realtime Map',
-        href: '/map',
+        href: '/',
         icon: Map,
     },
     {
         title: 'Traffic Analysis',
-        href: '/traffic-analysis',
+        href: '/traffic',
         icon: FolderClock ,
     },
     // Ships

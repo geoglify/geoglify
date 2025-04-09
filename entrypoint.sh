@@ -79,9 +79,6 @@ php artisan queue:clear
 # Optimize composer autoloader
 composer dump-autoload --optimize
 
-# Route cache
-php artisan route:cache
-
 # Install node dependencies
 npm install
 
@@ -89,15 +86,15 @@ npm install
 if [ "$PRODUCTION" = "1" ]; then
     npm run build
     echo "Running in production mode"
+    
+    # Route cache
+    php artisan route:cache
+    
+    echo "Supervisord started."
+    exec /usr/bin/supervisord -c /etc/supervisord.conf
 else
     echo "Running in development mode"
-fi
-
-# Start supervisord
-if [ "$PRODUCTION" = "1" ]; then
-    exec /usr/bin/supervisord -c /etc/supervisord.conf
-    echo "Supervisord started."
-else
-    exec /usr/bin/supervisord -c /etc/supervisord-dev.conf
+    
     echo "Supervisord-dev started."
+    exec /usr/bin/supervisord -c /etc/supervisord-dev.conf
 fi

@@ -20,6 +20,9 @@ Route::resource('ships', ShipController::class)->middleware(['auth', 'verified']
 // Ship last position route
 Route::post('ships/{ship}/last-positions', [ShipController::class, 'lastPositions'])->middleware(['auth', 'verified']);
 
+// Future API route
+Route::get('/traffic-heatmap', [TrafficController::class, 'heatmap']);
+
 // Include additional route files
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

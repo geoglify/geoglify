@@ -15,7 +15,7 @@ export default {
         // Set the map style based on the dark mode preference
         const style = isDarkMode
             ? 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
-            : 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json';
+            : 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
 
         return new maplibregl.Map({
             container: container, // HTML element ID or element to render the map
@@ -24,6 +24,7 @@ export default {
             zoom: zoom, // Initial zoom level
             bearing: bearing, // Initial bearing (rotation)
             antialias: true, // Enable antialiasing
+            attributionControl: false, // Disable attribution control
             //hash: "map", // Enable URL hash for map state
             glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf', // Font glyphs URL
         });

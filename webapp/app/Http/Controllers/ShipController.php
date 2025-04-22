@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreShipRequest;
-use App\Http\Requests\UpdateShipRequest;
 use Inertia\Inertia;
 use App\Models\Ship;
 use App\Models\ShipHistoricalPosition;
-use App\Models\ShipLatestPositionView;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -246,13 +243,13 @@ class ShipController extends Controller
             point_count > 0
     ", [$minLon, $minLat, $maxLon, $maxLat, $minLon, $minLat, $maxLon, $maxLat]);
 
-    
+
         // Calculate color opacity based on point count
         foreach ($grid as $hexagon) {
             $opacity = min(1, $hexagon->point_count / 10); // Adjust the divisor to control opacity
             $hexagon->color = sprintf('rgba(0, 0, 0, %s)', $opacity);
         }
-    
+
         return array_map(function ($hexagon) {
             return [
                 'type' => 'Feature',
@@ -263,55 +260,5 @@ class ShipController extends Controller
                 ],
             ];
         }, $grid);
-    }
-
-    public function countShips()
-    {
-        $interval = 15;
-        $data = DB::table('ship_realtime_positions')
-            ->select(
-                DB::raw('FLOOR(EXTRACT(EPOCH FROM last_updated) / ' . $interval . ') AS time_key'),
-                DB::raw('COUNT(DISTINCT id) AS current_ships')
-            )
-            ->where('last_updated', '>=', now()->subMinutes(5))
-            ->groupBy('time_key')
-            ->orderBy('time_key')
-            ->get();
-
-        return response()->json($data->map(fn($item) => [
-            'timestamp' => Carbon::createFromTimestamp($item->time_key * $interval)->format('H:i'),
-            'ships' => $item->current_ships
-        ]));
-    }
-
-    public function topCategories()
-    {
-        return response()->json(
-            ShipLatestPositionView::select(
-                'cargo_category_name as category',
-                'cargo_category_color as color',
-                DB::raw('COUNT(*) as count')
-            )
-                ->whereNotNull('cargo_category_name')
-                ->groupBy('cargo_category_name', 'cargo_category_color')
-                ->orderByDesc('count')
-                ->limit(5)
-                ->get()
-        );
-    }
-
-    public function topCountries()
-    {
-        return response()->json(
-            ShipLatestPositionView::select(
-                'country_name as country',
-                DB::raw('COUNT(*) as count')
-            )
-                ->whereNotNull('country_name')
-                ->groupBy('country_name')
-                ->orderByDesc('count')
-                ->limit(5)
-                ->get()
-        );
     }
 }

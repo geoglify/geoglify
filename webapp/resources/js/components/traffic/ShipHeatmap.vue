@@ -5,7 +5,6 @@ import { onMounted, ref } from 'vue';
 import MapHelper from '../../helpers/map';
 
 export default {
-
     setup() {
         const map = ref<maplibregl.Map | null>(null);
 
@@ -18,7 +17,8 @@ export default {
             map.value = MapHelper.createMap('heatmap', center, zoom, bearing, isDarkMode);
 
             map.value.on('load', () => {
-                loadHeatmapLayer();
+                //loadHeatmapLayer();
+                addGeoJSONToMap();
             });
         };
 
@@ -59,13 +59,42 @@ export default {
                             0.7,
                             '#fc4e2a',
                             1,
-                            '#e31a1c'
+                            '#e31a1c',
                         ],
                         'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 1, 15, 30],
                         'heatmap-opacity': 0.7,
                     },
                 });
             }
+        };
+
+        // load resources/data/atleca.geojson
+        const loadGeoJSON = async () => {
+            const response = await fetch('/data/atleca.geojson');
+            const geojson = await response.json();
+            return geojson;
+        };
+
+        // add geojson to map
+        const addGeoJSONToMap = async () => {
+            const geojson = await loadGeoJSON();
+            if (!map.value) return;
+
+            map.value.addSource('atleca', {
+                type: 'geojson',
+                data: geojson,
+            });
+
+            map.value.addLayer({
+                id: 'atleca-layer',
+                type: 'fill',
+                source: 'atleca',
+                paint: {
+                    'fill-color': '#ADEBB3',
+                    'fill-opacity': 1,
+                    'fill-outline-color': 'rgba(0, 0, 0, 0.4)'
+                },
+            });
         };
 
         onMounted(() => {

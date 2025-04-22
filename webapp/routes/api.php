@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\AisController;
+use App\Http\Controllers\Api\AisController;
 use Illuminate\Support\Facades\Route;
 
-Route::apiResource('ais', AisController::class);
+Route::post('/ais', [AisController::class, 'store'])->name('ais.store');

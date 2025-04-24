@@ -17,7 +17,7 @@ export default {
             map.value = MapHelper.createMap('heatmap', center, zoom, bearing, isDarkMode);
 
             map.value.on('load', () => {
-                //loadHeatmapLayer();
+                loadHeatmapLayer();
                 addGeoJSONToMap();
             });
         };
@@ -25,7 +25,7 @@ export default {
         const loadHeatmapLayer = async () => {
             if (!map.value) return;
 
-            const response = await fetch('/traffic-heatmap');
+            const response = await fetch('/api/ais-heatmap');
             const geojson = await response.json();
 
             if (map.value.getSource('ships-heatmap')) {

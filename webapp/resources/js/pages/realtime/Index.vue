@@ -14,6 +14,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 defineProps<{
     ships?: Array<any>;
 }>();
+
 </script>
 
 <template>

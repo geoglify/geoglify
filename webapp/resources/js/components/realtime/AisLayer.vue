@@ -84,8 +84,6 @@ export default {
                 if (endIndex < this.data.length) {
                     await new Promise(resolve => setTimeout(resolve, 0));
                     await processBatch(endIndex);
-                } else {
-                    this.fitMapToBounds();
                 }
             };
 
@@ -98,14 +96,6 @@ export default {
                 features: ShipHelper.createShipFeature(ship) || [],
                 lastUpdated: Date.now()
             };
-        },
-
-        fitMapToBounds() {
-            const shipsArray = Array.from(this.ships.values());
-            if (shipsArray.length === 0) return;
-            
-            const bounds = MapHelper.getBounds(shipsArray);
-            this.mapInstance.fitBounds(bounds, { padding: 100 });
         },
 
         setupEventListeners() {

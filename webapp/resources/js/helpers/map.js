@@ -11,18 +11,18 @@ MapboxDraw.constants.classes.CONTROL_GROUP = 'maplibregl-ctrl-group';
  */
 export default {
     // Create a new map instance
-    createMap(container, center = [0, 0], zoom = 1, bearing = 0, isDarkMode = false) {
+    createMap(container, settings, isDarkMode = false) {
         // Set the map style based on the dark mode preference
         const style = isDarkMode
             ? 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
-            : 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json';
+            : settings.default_style;
 
         return new maplibregl.Map({
             container: container, // HTML element ID or element to render the map
             style: style, // Map style URL
-            center: center, // Initial map center [longitude, latitude]
-            zoom: zoom, // Initial zoom level
-            bearing: bearing, // Initial bearing (rotation)
+            center: [settings.default_longitude, settings.default_latitude], // Initial center coordinates
+            zoom: settings.default_zoom, // Initial zoom level
+            bearing: settings.default_bearing, // Initial bearing (rotation)
             antialias: true, // Enable antialiasing
             attributionControl: false, // Disable attribution control
             //hash: "map", // Enable URL hash for map state
@@ -104,7 +104,9 @@ export default {
                     ['boolean', ['feature-state', 'highlighted'], false],
                     'yellow', // If highlighted is true, use yellow
                     ['get', 'color'], // Otherwise, use the color from the feature properties
-                ],
+                ],                
+                'text-halo-color': '#fff', // Set text halo color
+                'text-halo-width': 1, // Set text halo width
             },
             filter: ['==', ['get', 'type'], 'icon'], // Filter for icon features
             minzoom: 0, // Set the minimum zoom level

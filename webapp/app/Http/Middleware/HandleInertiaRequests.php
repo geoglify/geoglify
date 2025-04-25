@@ -2,9 +2,9 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use App\Models\Configuration;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -36,14 +36,18 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
-
         return [
             ...parent::share($request),
             'name' => config('app.name'),
-            'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
+            ],
+            'map' => [
+                'default_latitude' => Configuration::where('key', 'default_latitude')->value('value') ?? 0,
+                'default_longitude' => Configuration::where('key', 'default_longitude')->value('value') ?? 0,
+                'default_zoom' => Configuration::where('key', 'default_zoom')->value('value') ?? 1,
+                'default_bearing' => Configuration::where('key', 'default_bearing')->value('value') ?? 0,
+                'default_style' => Configuration::where('key', 'default_style')->value('value') ?? 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
             ],
         ];
     }

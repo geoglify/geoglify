@@ -9,12 +9,9 @@ export default {
         const map = ref<maplibregl.Map | null>(null);
 
         const initializeMap = () => {
-            const zoom = 2;
-            const center = [0, 0];
-            const bearing = 0;
             const isDarkMode = localStorage.getItem('appearance') === 'dark';
 
-            map.value = MapHelper.createMap('heatmap', center, zoom, bearing, isDarkMode);
+            map.value = MapHelper.createMap('heatmap', null, isDarkMode);
 
             map.value.on('load', () => {
                 loadHeatmapLayer();

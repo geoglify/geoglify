@@ -26,8 +26,8 @@ const props = defineProps<Props>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'AIS Server',
-        href: '/configurations/ais-server',
+        title: 'Map settings',
+        href: '/configurations/map-settings',
     },
 ];
 

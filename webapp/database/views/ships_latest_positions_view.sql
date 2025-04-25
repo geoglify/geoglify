@@ -29,11 +29,13 @@ WITH latest_positions AS (
         FROM ship_realtime_positions
         WHERE latitude IS NOT NULL
           AND longitude IS NOT NULL
+          AND last_updated IS NOT NULL
     ) subquery
     WHERE rn = 1
+      AND last_updated >= NOW() - INTERVAL '120 minutes'
 )
 SELECT 
-    LEFT(ships.mmsi::text, 3) AS country_code, -- PostgreSQL
+    LEFT(ships.mmsi::text, 3) AS country_code,
     ships.id,
     ships.mmsi,
     ships.name,

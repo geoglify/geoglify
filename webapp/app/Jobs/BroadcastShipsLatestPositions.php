@@ -20,9 +20,9 @@ class BroadcastShipsLatestPositions implements ShouldQueue
      */
     public function handle(): void
     {
-        // Processing only ships with last_updated no more than 15 seconds ago
+        // Processing only ships with last_updated no more than 30 seconds ago
         $now = now();
-        $lastUpdatedThreshold = $now->subSeconds(15);
+        $lastUpdatedThreshold = $now->subSeconds(30);
         $ships = ShipLatestPositionView::where('last_updated', '>=', $lastUpdatedThreshold)
             ->orderBy('last_updated', 'desc')
             ->get();

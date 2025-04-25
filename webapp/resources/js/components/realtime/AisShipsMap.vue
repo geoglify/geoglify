@@ -1,13 +1,16 @@
 <script lang="ts">
 import 'maplibre-theme/classic.css';
 import 'maplibre-theme/icons.lucide.css';
-import { mapActions, mapState } from 'vuex';
 import MapHelper from '../../helpers/map';
-import ShipLayer from './AisLayer.vue';
+import AisLayer from './AisLayer.vue';
+import { Badge } from '@/components/ui/badge';
+import { Ship } from 'lucide-vue-next';
 
 export default {
     components: {
-        ShipLayer,
+        AisLayer,
+        Badge,
+        Ship
     },
 
     props: {
@@ -21,27 +24,6 @@ export default {
             map: null,
             mapIsReady: false,
         };
-    },
-
-    computed: {
-        // Mapping Vuex state to local computed properties
-        ...mapState(['selectedShip']),
-    },
-
-    watch: {
-        // Watch for changes in the selected ship
-        realtimePosition(newPosition) {
-            if (!!newPosition && this.mapIsReady) {
-                this.centerMapOnShip(newPosition);
-            }
-        },
-
-        // Watch for changes in the selected ship
-        selectedShip(newShip) {
-            if (!!newShip && !!this.realtimePosition && this.mapIsReady) {
-                this.centerMapOnShip(this.realtimePosition);
-            }
-        },
     },
 
     mounted() {
@@ -66,40 +48,24 @@ export default {
                 this.map.on('load', async () => {
                     // Load the base layer
                     this.mapIsReady = true;
-
-                    // Define the base layer
-                    if (!!this.realtimePosition) {
-                        this.centerMapOnShip(this.realtimePosition);
-                    }
-
-                    // Define the base layer
-                    if (!!this.ship) {
-                        this.setSelectedShip(this.ship);
-                    }
                 });
             }
         },
-
-        // Center the map on the ship
-        centerMapOnShip(ship) {
-            //find the ship with the same mmsi
-            const selectedShip = this.ships.find((s) => s.mmsi === ship.mmsi);
-
-            if (!selectedShip) return;
-
-            this.map.setCenter([selectedShip.longitude, selectedShip.latitude]);
-            this.map.setZoom(17);
-        },
-
-        // Add or update the ship
-        ...mapActions(['addOrUpdateShip', 'setSelectedShip']),
     },
 };
 </script>
 
 <template>
-    <div id="map"></div>
-    <ShipLayer :mapInstance="map" :data="ships" v-if="mapIsReady" />
+    <div id="map" class="rounded-br-lg rounded-bl-lg"></div>
+    
+    <div class="absolute top-0 right-0 z-10 p-4">
+        <Badge>
+            <Ship class="mr-2 h-4 w-4" />
+            <span>{{ ships.length }} Ships</span>
+        </Badge>
+    </div>
+    
+    <AisLayer :mapInstance="map" :data="ships" v-if="mapIsReady" />
 </template>
 
 <style>

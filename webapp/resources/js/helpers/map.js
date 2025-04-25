@@ -15,7 +15,7 @@ export default {
         // Set the map style based on the dark mode preference
         const style = isDarkMode
             ? 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
-            : 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
+            : 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json';
 
         return new maplibregl.Map({
             container: container, // HTML element ID or element to render the map
@@ -88,10 +88,15 @@ export default {
             source: source,
             layout: {
                 'icon-image': ['get', 'image'], // Use the ship's icon
-                'icon-size': 0.8, // Set icon size
+                'icon-size': 0.6, // Set icon size
                 'icon-rotate': ['get', 'hdg'], // Rotate icon based on heading
                 'icon-rotation-alignment': 'map', // Align rotation with the map
-                'icon-allow-overlap': true, // Allow icons to overlap
+                'icon-overlap': 'cooperative', // Allow overlapping icons
+                'text-field': ['get', 'name'], // Display the ship's name
+                'text-font': ['Open Sans Bold'], // Set font
+                'text-size': 10, // Set text size
+                'text-variable-anchor-offset': ['top', [0, 0.5], 'bottom', [0, -0.5], 'left', [0.5, 0], 'right', [-0.5, 0]], // Set variable anchor offsets
+                'text-justify': 'auto', // Justify text automatically
             },
             paint: {
                 'icon-color': [
@@ -143,6 +148,8 @@ export default {
                 'text-halo-width': 1, // Set text halo width
             },
             filter: ['==', ['get', 'type'], 'text'], // Filter for text features
+            minzoom: 15, // Set the minimum zoom level
+            maxzoom: 24, // Set the maximum zoom level
         });
     },
 

@@ -4,88 +4,44 @@
 
 <script lang="js">
 import MapHelper from '@/helpers/map';
-import store from '@/store';
+import ShipHelper from "@/helpers/ships";
+import { throttle } from 'lodash-es';
 
 export default {
     props: ['mapInstance', 'data'],
 
     data() {
         return {
-            lastUpdate: Date.now(), // Time of the last update
-            isMapInteracting: false, // Whether the user is interacting with the map
-            tempShipUpdates: [], // Temporary storage for ship updates while interacting with the map
+            ships: new Map(),
+            lastUpdate: Date.now(),
+            isMapInteracting: false,
+            tempShipUpdates: new Map(),
+            updateQueue: new Set(),
+            animationFrameId: null,
+            visibilityThreshold: 1000,
+            chunkSize: 200,
+            visibleBounds: null
         };
     },
 
     async mounted() {
-        // Initialize the ship layer and fetch initial ship data
         await this.initializeLayer();
-        await this.fetchShips();
-
-        // Listen for real-time ship position updates
-        window.Echo.channel('ships.latest_positions').listen('ShipsLatestPositionsUpdated', (data) => {
-            console.log('count:', data.length);
-
-            if (this.isMapInteracting) {
-                // Loop through incoming ship data
-                data.forEach((newShip) => {
-                    // Check if a ship with the same MMSI already exists in tempShipUpdates
-                    const existingShipIndex = this.tempShipUpdates.findIndex((ship) => ship.mmsi === newShip.mmsi);
-
-                    if (existingShipIndex !== -1) {
-                        // If the ship exists, update it with the more recent data
-                        this.tempShipUpdates[existingShipIndex] = newShip;
-                    } else {
-                        // If the ship doesn't exist, add it to the array
-                        this.tempShipUpdates.push(newShip);
-                    }
-                });
-
-                //size of data and size of tempShipUpdates
-                console.log(`Data size: ${data.length}, Temp updates size: ${this.tempShipUpdates.length}`);
-            } else {
-                // If the map is not being interacted with, update the map immediately
-                data.forEach((ship) => {
-                    store.dispatch('addOrUpdateShip', ship);
-                });
-                this.updateSource(); // Update the map immediately
-            }
-        });
-
-        // Monitor user interactions with the map
-        this.mapInstance.on('movestart', () => {
-            this.isMapInteracting = true; // User started moving the map
-        });
-
-        this.mapInstance.on('moveend', () => {
-            this.isMapInteracting = false; // User stopped moving the map
-            this.applyTempUpdates(); // Apply accumulated updates when interaction ends
-        });
-
-        this.mapInstance.on('zoomstart', () => {
-            this.isMapInteracting = true; // User started zooming
-        });
-
-        this.mapInstance.on('zoomend', () => {
-            this.isMapInteracting = false; // User stopped zooming
-            this.applyTempUpdates(); // Apply accumulated updates when interaction ends
-        });
+        await this.processInitialData();
+        this.setupEventListeners();
+        this.startUpdateLoop();
     },
 
-    computed: {
-        ships() {
-            return store.getters.getShips;
-        },
-
-        selectedShip() {
-            return store.getters.getSelectedShip;
-        },
+    beforeDestroy() {
+        this.cleanupEventListeners();
+        cancelAnimationFrame(this.animationFrameId);
     },
 
     methods: {
         async initializeLayer() {
-            await MapHelper.addIcon(this.mapInstance, 'shipIcon', '/images/boat-sdf.png');
-            await MapHelper.addIcon(this.mapInstance, 'circleIcon', '/images/circle-sdf.png');
+            await Promise.all([
+                MapHelper.addIcon(this.mapInstance, 'shipIcon', '/images/boat-sdf.png'),
+                MapHelper.addIcon(this.mapInstance, 'circleIcon', '/images/circle-sdf.png')
+            ]);
 
             MapHelper.removeLayers(this.mapInstance, 'shipLayer');
             MapHelper.removeSource(this.mapInstance, 'shipSource');
@@ -93,76 +49,201 @@ export default {
             MapHelper.addSource(this.mapInstance, 'shipSource');
             MapHelper.addLayer(this.mapInstance, 'shipLayer', 'shipSource');
 
-            this.mapInstance.on('click', 'shipLayer', (e) => {
-                const ship = e.features[0].properties;
-                //redirect to ship details page
-                window.location.href = `/ships/${ship.id}`;
-            });
+            this.setupLayerInteractions();
+        },
 
+        setupLayerInteractions() {
+            const handleShipClick = (e) => {
+                const ship = e.features[0].properties;
+                window.location.href = `/ships/${ship.id}`;
+            };
+
+            this.mapInstance.on('click', 'shipLayer', handleShipClick);
             this.mapInstance.on('mouseenter', 'shipLayer', () => {
                 this.mapInstance.getCanvas().style.cursor = 'pointer';
             });
 
-            this.mapInstance.on('click', 'shipLayer-skeleton', (e) => {
-                const ship = e.features[0].properties;
-                //redirect to ship details page
-                window.location.href = `/ships/${ship.id}`;
+            this.layerEventHandlers = {
+                click: handleShipClick
+            };
+        },
+
+        async processInitialData() {
+            
+            if (!this.data?.length) return;
+
+            const processBatch = async (startIndex) => {
+                const endIndex = Math.min(startIndex + this.chunkSize, this.data.length);
+                
+                for (let i = startIndex; i < endIndex; i++) {
+                    const ship = this.data[i];
+                    this.ships.set(ship.mmsi, this.processShipData(ship));
+                    this.scheduleUpdate(ship.mmsi);
+                }
+
+                if (endIndex < this.data.length) {
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                    await processBatch(endIndex);
+                } else {
+                    this.fitMapToBounds();
+                }
+            };
+
+            await processBatch(0);
+        },
+
+        processShipData(ship) {
+            return {
+                ...ship,
+                features: ShipHelper.createShipFeature(ship) || [],
+                lastUpdated: Date.now()
+            };
+        },
+
+        fitMapToBounds() {
+            const shipsArray = Array.from(this.ships.values());
+            if (shipsArray.length === 0) return;
+            
+            const bounds = MapHelper.getBounds(shipsArray);
+            this.mapInstance.fitBounds(bounds, { padding: 100 });
+        },
+
+        setupEventListeners() {
+            this.echoChannel = window.Echo.channel('ships.latest_positions')
+                .listen('ShipsLatestPositionsUpdated', this.handleRealTimeUpdates);
+
+            const interactionEvents = ['movestart', 'zoomstart', 'rotatestart'];
+            const interactionEndEvents = ['moveend', 'zoomend', 'rotateend'];
+
+            interactionEvents.forEach(event => {
+                this.mapInstance.on(event, () => {
+                    this.isMapInteracting = true;
+                });
             });
 
-            this.mapInstance.on('mouseenter', 'shipLayer-skeleton', () => {
-                this.mapInstance.getCanvas().style.cursor = 'pointer';
+            interactionEndEvents.forEach(event => {
+                this.mapInstance.on(event, () => {
+                    this.isMapInteracting = false;
+                    this.applyPendingUpdates();
+                    this.updateVisibleBounds();
+                });
+            });
+
+            this.throttledUpdateVisibleBounds = throttle(() => {
+                this.updateVisibleBounds();
+            }, 500);
+
+            this.mapInstance.on('move', this.throttledUpdateVisibleBounds);
+        },
+
+        handleRealTimeUpdates(data) {
+            
+            console.log('Real-time data received:', data);
+            
+            data.forEach(ship => {
+                if (this.isMapInteracting) {
+                    this.tempShipUpdates.set(ship.mmsi, ship);
+                } else {
+                    this.ships.set(ship.mmsi, this.processShipData(ship));
+                    this.scheduleUpdate(ship.mmsi);
+                }
             });
         },
 
-        async fetchShips() {
-            if (!this.data || this.data.length === 0) {
-                return;
-            }
+        scheduleUpdate(mmsi) {
+            this.updateQueue.add(mmsi);
+        },
 
+        applyPendingUpdates() {
+            if (this.tempShipUpdates.size === 0) return;
+
+            this.tempShipUpdates.forEach((ship, mmsi) => {
+                this.ships.set(mmsi, this.processShipData(ship));
+                this.scheduleUpdate(mmsi);
+            });
+            
+            this.tempShipUpdates.clear();
+        },
+
+        updateVisibleBounds() {
             try {
-                this.data.forEach((ship) => {
-                    store.dispatch('addOrUpdateShip', ship);
-                });
-
-                // Fit the map to the bounds of the ship data
-                const bounds = MapHelper.getBounds(this.ships);
-                this.mapInstance.fitBounds(bounds, {
-                    padding: 100,
-                });
-
-                this.updateLoop();
+                this.visibleBounds = this.mapInstance.getBounds();
             } catch (error) {
-                console.error('API Error:', error);
+                console.warn('Could not update map bounds:', error);
             }
         },
 
-        updateSource() {
-            const features = this.ships.map((ship) => ship.features).flat();
-            MapHelper.updateSource(this.mapInstance, 'shipSource', features);
+        startUpdateLoop() {
+            const update = () => {
+                const now = Date.now();
+                
+                if (now - this.lastUpdate >= this.visibilityThreshold && !this.isMapInteracting) {
+                    this.updateMapSource();
+                    this.lastUpdate = now;
+                }
+
+                this.animationFrameId = requestAnimationFrame(update);
+            };
+
+            update();
         },
 
-        updateLoop() {
-            const now = Date.now();
-            const delta = now - this.lastUpdate;
+        updateMapSource() {
+            
+            if (this.updateQueue.size === 0) return;
 
-            if (delta >= 1000 && !this.isMapInteracting) {
-                this.updateSource();
-                this.lastUpdate = now;
+            let features = [];
+            const updateTime = Date.now();
+
+            // Otimização: atualizar apenas navios modificados recentemente
+            if (this.ships.size > 5000) {
+                const visibleShips = this.visibleBounds 
+                    ? this.getVisibleShips() 
+                    : Array.from(this.ships.values());
+                
+                features = visibleShips
+                    .filter(ship => 
+                        this.updateQueue.has(ship.mmsi) && 
+                        updateTime - ship.lastUpdated < 30000
+                    )
+                    .flatMap(ship => ship.features);
+            } else {
+                features = Array.from(this.ships.values())
+                    .filter(ship => this.updateQueue.has(ship.mmsi))
+                    .flatMap(ship => ship.features);
+            }
+            
+            if (features.length > 0) {
+                MapHelper.updateSource(this.mapInstance, 'shipSource', features);
             }
 
-            requestAnimationFrame(() => this.updateLoop());
+            this.updateQueue.clear();
         },
 
-        applyTempUpdates() {
-            // If there are accumulated updates and the map is no longer being interacted with, apply them
-            if (this.tempShipUpdates.length > 0) {
-                this.tempShipUpdates.forEach((ship) => {
-                    store.dispatch('addOrUpdateShip', ship);
-                });
-                this.tempShipUpdates = []; // Clear the temporary updates list
-                this.updateSource(); // Update the map with new positions
-            }
+        getVisibleShips() {
+            return Array.from(this.ships.values()).filter(ship => {
+                try {
+                    return this.visibleBounds.contains([ship.longitude, ship.latitude]);
+                } catch (error) {
+                    console.warn('Error checking ship visibility:', error);
+                    return false;
+                }
+            });
         },
-    },
+
+        cleanupEventListeners() {
+            if (this.echoChannel) {
+                window.Echo.leaveChannel('ships.latest_positions');
+            }
+
+            if (this.throttledUpdateVisibleBounds) {
+                this.mapInstance.off('move', this.throttledUpdateVisibleBounds);
+            }
+
+            if (this.layerEventHandlers?.click) {
+                this.mapInstance.off('click', 'shipLayer', this.layerEventHandlers.click);
+            }
+        }
+    }
 };
 </script>

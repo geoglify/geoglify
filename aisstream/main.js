@@ -22,8 +22,8 @@ function connectToAisStreamWithRetry() {
         Apikey: AISSTREAM_API_KEY,
         BoundingBoxes: [
           [
-            [29.343875, -35.419922],
-            [45.690833, 6.394043],
+            [-90, -180],
+            [90, 180],
           ],
         ],
       };

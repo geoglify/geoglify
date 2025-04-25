@@ -42,6 +42,7 @@
         "d3-array": "^3.2.4",
         "d3-geo": "^3.1.1",
         "laravel-vite-plugin": "^1.0",
+        "lodash-es": "^4.17.21",
         "lucide": "^0.468.0",
         "lucide-react": "^0.483.0",
         "lucide-vue-next": "^0.468.0",

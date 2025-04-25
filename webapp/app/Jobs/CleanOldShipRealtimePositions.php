@@ -18,8 +18,8 @@ class CleanOldShipRealtimePositions implements ShouldQueue
      */
     public function handle(): void
     {
-        // Calculate the threshold time (30 minutes ago)
-        $threshold = Carbon::now()->subMinutes(30);
+        // Calculate the threshold time (120 minutes ago)
+        $threshold = Carbon::now()->subMinutes(120);
 
         // Delete all records older than the threshold
         ShipRealtimePosition::where('last_updated', '<=', $threshold)->delete();

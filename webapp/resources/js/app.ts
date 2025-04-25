@@ -7,8 +7,6 @@ import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import { initializeTheme } from './composables/useAppearance';
-import Vuex from "vuex";
-import store from './store';
 import i18n from './i18n';
 import CountryFlag from 'vue-country-flag-next';
 
@@ -33,8 +31,6 @@ createInertiaApp({
     setup({ el, App, props, plugin }) {
         createApp({ render: () => h(App, props) })
             .use(plugin)
-            .use(Vuex)
-            .use(store)
             .use(i18n)
             .use(ZiggyVue)
             .use(CountryFlag)

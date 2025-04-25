@@ -18,7 +18,7 @@ export default {
 
             map.value.on('load', () => {
                 loadHeatmapLayer();
-                addGeoJSONToMap();
+                //addGeoJSONToMap();
             });
         };
 
@@ -109,7 +109,7 @@ export default {
 </script>
 
 <template>
-    <div id="heatmap"></div>
+    <div id="heatmap" class="rounded-br-lg rounded-bl-lg"></div>
 </template>
 
 <style scoped>

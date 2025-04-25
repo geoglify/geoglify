@@ -2,12 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Ship extends Model
 {
-    use HasFactory;
 
     /**
      * Append the following attributes to the response.

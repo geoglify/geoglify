@@ -22,4 +22,5 @@ Route::post('ships/{ship}/last-positions', [ShipController::class, 'lastPosition
 
 // Include additional route files
 require __DIR__ . '/settings.php';
+require __DIR__ . '/configurations.php';
 require __DIR__ . '/auth.php';

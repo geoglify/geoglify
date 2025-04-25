@@ -5,7 +5,7 @@ import NavUser from '@/components/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { Map, FolderClock, Ship, User, Lock, Pickaxe, Anchor, LandPlot, Antenna } from 'lucide-vue-next';
+import { Map, FolderClock, Ship, User, Lock, Pickaxe, Anchor, LandPlot, Wrench  } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const mainNavItems: NavItem[] = [
@@ -40,12 +40,6 @@ const mainNavItems: NavItem[] = [
 ];
 
 const managementNavItems: NavItem[] = [
-    // AIS
-    {
-        title: 'AIS',
-        href: '/ais',
-        icon: Antenna,
-    },
     // Users
     {
         title: 'Users',
@@ -63,6 +57,12 @@ const managementNavItems: NavItem[] = [
         title: 'Permissions',
         href: '/permissions',
         icon: Lock,
+    },
+    // Configurations
+    {
+        title: 'Configurations',
+        href: '/configurations',
+        icon: Wrench ,
     },
 ];
 

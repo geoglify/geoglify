@@ -55,10 +55,12 @@ services:
         container_name: gaisdecoder
         working_dir: /opt/aisdecoder
         command: 'node main.js'
+        ports:
+            - 9002:9002
         environment:
-            AIS_ANTENNA_HOST: 'ssia-ais.erau.edu'
-            AIS_ANTENNA_PORT: 4000
-            API_URL: http://webapp/api/ais
+            API_URL: http://webapp/api
+            BATCH_SIZE: 1000
+            FLUSH_INTERVAL: 1000
         depends_on:
             - webapp
             
@@ -68,7 +70,6 @@ services:
         working_dir: /opt/aisstream
         command: 'node main.js'
         environment:
-            NODE_ENV: production
             AISSTREAM_API_KEY: ecee1eee9dd77a3f63c44820715217c00f7f3358
             API_URL: http://webapp/api/ais
             BATCH_SIZE: 1000

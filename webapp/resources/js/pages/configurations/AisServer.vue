@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { ref, onBeforeUnmount, watch } from 'vue';
-import { TransitionRoot } from '@headlessui/vue';
-import { Head, useForm } from '@inertiajs/vue3';
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
@@ -10,6 +7,9 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
 import ConfigurationsLayout from '@/layouts/configurations/Layout.vue';
 import { type BreadcrumbItem } from '@/types';
+import { TransitionRoot } from '@headlessui/vue';
+import { Head, useForm } from '@inertiajs/vue3';
+import { onBeforeUnmount, ref, watch } from 'vue';
 
 interface Props {
     ais_host: string;
@@ -40,7 +40,7 @@ const submit = () => {
 const connectionState = ref<'connecting' | 'connected' | 'disconnected'>('disconnected');
 const consoleData = ref('');
 let eventSource: EventSource | null = null;
-const interval = ref<ReturnType<typeof setInterval> | null>(null); 
+const interval = ref<ReturnType<typeof setInterval> | null>(null);
 
 const connect = () => {
     // Prevent multiple connections if already connected or connecting
@@ -107,7 +107,7 @@ const toggleConnection = () => {
 
 const clearConsole = () => {
     consoleData.value = '';
-}
+};
 
 const printConsole = (message: string) => {
     const timestamp = new Date().toLocaleTimeString();
@@ -132,7 +132,6 @@ watch(consoleData, () => {
 onBeforeUnmount(() => {
     disconnect();
 });
-
 </script>
 
 <template>
@@ -142,7 +141,6 @@ onBeforeUnmount(() => {
 
         <ConfigurationsLayout>
             <div class="grid grid-cols-1 gap-6">
-
                 <div class="flex flex-col space-y-6">
                     <HeadingSmall title="AIS Server"
                         description="Configure the AIS server settings for your application" />
@@ -170,29 +168,35 @@ onBeforeUnmount(() => {
                         </TransitionRoot>
                     </form>
                 </div>
-                
-                <div class="space-y-2 mt-0">
-                    <div class="flex justify-between items-center">
+
+                <div class="mt-0 space-y-2">
+                    <div class="flex items-center justify-between">
                         <Label class="block"><b>AIS Console</b></Label>
                         <p class="text-sm text-neutral-600">
                             <span :class="{
                                 'text-green-500': connectionState === 'connected',
-                                'text-yellow-500 animate-pulse': connectionState === 'connecting',
-                                'text-red-500': connectionState === 'disconnected'
+                                'animate-pulse text-yellow-500': connectionState === 'connecting',
+                                'text-red-500': connectionState === 'disconnected',
                             }">
-                                {{ connectionState === 'connected' ? '🟢 Connected' : connectionState === 'connecting' ?
-                                '🟡 Connecting' : '🔴 Disconnected' }}
+                                {{
+                                    connectionState === 'connected'
+                                        ? '🟢 Connected'
+                                        : connectionState === 'connecting'
+                                            ? '🟡 Connecting'
+                                            : '🔴 Disconnected'
+                                }}
                             </span>
                         </p>
                     </div>
 
                     <textarea ref="consoleTextarea" readonly
-                        class="w-full h-[450px] p-2 gap-0 font-mono text-sm border rounded-md resize-none bg-neutral-900 text-white"
+                        class="h-[450px] w-full resize-none gap-0 rounded-md border bg-neutral-900 p-2 font-mono text-sm text-white"
                         :value="consoleData"></textarea>
 
                     <div class="flex flex-wrap gap-2">
-                        <Button type="button" variant="outline" @click="toggleConnection">{{ connectionState ===
-                            'connected' ? 'Disconnect' : 'Connect' }}</Button>
+                        <Button type="button" variant="outline" @click="toggleConnection">{{
+                            connectionState === 'connected' ? 'Disconnect' : 'Connect'
+                        }}</Button>
                         <Button type="button" variant="ghost" @click="clearConsole">Clear Console</Button>
                     </div>
                 </div>

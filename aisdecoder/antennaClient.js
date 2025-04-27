@@ -1,29 +1,32 @@
 const net = require("net");
-const http = require("http");
 const readline = require("readline");
 const { AisDecode, NmeaDecode } = require("ggencoder");
-const axios = require("axios");
-const { BATCH_SIZE, FLUSH_INTERVAL, API_URL } = require("./config");
-
-const RETRY_TIMEOUT = 5000;
-const eventQueue = [];
-const clients = [];
 
 class AntennaClient {
-    constructor(host, port) {
+    constructor(host, port, eventQueue, clients) {
         this.antennaIp = host;
         this.antennaPort = port;
+        this.eventQueue = eventQueue;
+        this.clients = clients;
         this.retrying = false;
         this.session = {};
         this.client = new net.Socket();
         this.registerConnectionEvents();
     }
 
+    async start() {
+        await this.connectAntenna();
+    }
+
     connectAntenna() {
         return new Promise((resolve) => {
             if (!this.retrying) {
                 this.retrying = true;
-                console.log("\nConnecting to: ", this.antennaIp, this.antennaPort);
+                console.log(
+                    "\nConnecting to:",
+                    this.antennaIp,
+                    this.antennaPort
+                );
                 this.client.connect(this.antennaPort, this.antennaIp);
                 resolve();
             }
@@ -31,7 +34,11 @@ class AntennaClient {
     }
 
     handleSocketConnect() {
-        console.log("Connected to AIS Source: ", this.antennaIp, this.antennaPort);
+        console.log(
+            "Connected to AIS Source:",
+            this.antennaIp,
+            this.antennaPort
+        );
         this.retrying = false;
 
         const lineReader = readline.createInterface({
@@ -42,8 +49,8 @@ class AntennaClient {
 
         lineReader.on("line", (message) => {
             this.decodeAndQueueMessage(message);
-            
-            clients.forEach((client) => {
+
+            this.clients.forEach((client) => {
                 client.write(`data: ${message}\n\n`);
             });
         });
@@ -55,15 +62,13 @@ class AntennaClient {
 
         let decMsg = new NmeaDecode(aisPayload, this.session);
         if (decMsg.valid) {
-            const shipData = this.decodeStreamMessage(decMsg);
-            this.queueEvent(shipData);
+            this.queueEvent(this.decodeStreamMessage(decMsg));
             return;
         }
 
         decMsg = new AisDecode(aisPayload, this.session);
         if (decMsg.valid) {
-            const shipData = this.decodeStreamMessage(decMsg);
-            this.queueEvent(shipData);
+            this.queueEvent(this.decodeStreamMessage(decMsg));
         }
     }
 
@@ -100,41 +105,43 @@ class AntennaClient {
     }
 
     queueEvent(event) {
-        const existingIndex = eventQueue.findIndex((e) => e.mmsi === event.mmsi);
+        const existingIndex = this.eventQueue.findIndex(
+            (e) => e.mmsi === event.mmsi
+        );
         if (existingIndex !== -1) {
-            eventQueue[existingIndex] = {
-                ...eventQueue[existingIndex],
+            this.eventQueue[existingIndex] = {
+                ...this.eventQueue[existingIndex],
                 ...event,
                 last_updated: new Date(),
             };
         } else {
-            eventQueue.push(event);
+            this.eventQueue.push(event);
         }
     }
 
     handleSocketClose() {
-        console.log("Connection closed: ", this.antennaIp, this.antennaPort);
+        console.log("Connection closed:", this.antennaIp, this.antennaPort);
         this.retrying = false;
-        setTimeout(() => this.connectAntenna(), RETRY_TIMEOUT);
+        setTimeout(() => this.connectAntenna(), 5000);
     }
 
     handleSocketEnd() {
-        console.log("Connection ended: ", this.antennaIp, this.antennaPort);
+        console.log("Connection ended:", this.antennaIp, this.antennaPort);
         this.retrying = false;
-        setTimeout(() => this.connectAntenna(), RETRY_TIMEOUT);
+        setTimeout(() => this.connectAntenna(), 5000);
     }
 
     handleSocketTimeout() {
-        console.log("Connection timeout: ", this.antennaIp, this.antennaPort);
+        console.log("Connection timeout:", this.antennaIp, this.antennaPort);
         this.retrying = false;
         if (this.client) this.client.end();
     }
 
     handleSocketError(err) {
-        console.error("Connection error: ", err.message);
+        console.error("Connection error:", err.message);
         this.retrying = false;
         if (this.client) this.client.destroy();
-        setTimeout(() => this.connectAntenna(), RETRY_TIMEOUT);
+        setTimeout(() => this.connectAntenna(), 5000);
     }
 
     registerConnectionEvents() {
@@ -145,78 +152,6 @@ class AntennaClient {
         this.client.on("timeout", this.handleSocketTimeout.bind(this));
         this.client.on("error", this.handleSocketError.bind(this));
     }
-
-    async start() {
-        await this.connectAntenna();
-    }
 }
 
-async function flushEvents() {
-    if (eventQueue.length === 0) return;
-    const chunk = eventQueue.slice(0, BATCH_SIZE);
-
-    try {
-        console.info(`Sending ${chunk.length} of ${eventQueue.length} ships to the API`);
-
-        const response = await axios.post(`${API_URL}/ais`, chunk, {
-            headers: { "Content-Type": "application/json" },
-        });
-
-        if (response.status === 202) {
-            console.info("Ships sent successfully to the API");
-        }
-
-        eventQueue.splice(0, chunk.length);
-    } catch (error) {
-        console.error(`Error sending ships to the API ${API_URL}/ais: ${error}`);
-    }
-}
-
-setInterval(flushEvents, FLUSH_INTERVAL);
-
-const sseServer = http.createServer((req, res) => {
-    if (req.url === "/stream") {
-        res.writeHead(200, {
-            "Content-Type": "text/event-stream",
-            "Cache-Control": "no-cache",
-            Connection: "keep-alive",
-            "Access-Control-Allow-Origin": "*",
-        });
-
-        res.write("\n");
-        clients.push(res);
-
-        req.on("close", () => {
-            const idx = clients.indexOf(res);
-            if (idx !== -1) clients.splice(idx, 1);
-        });
-    } else {
-        res.writeHead(404);
-        res.end();
-    }
-});
-
-sseServer.listen(9002, () => {
-    console.log("SSE server listening on http://localhost:9002/stream");
-});
-
-async function startApp() {
-    try {
-        const { data } = await axios.get(`${API_URL}/ais-configuration`, {
-            headers: { "Content-Type": "application/json" },
-        });
-
-        const host = data.ais_host;
-        const port = parseInt(data.ais_port, 10);
-
-        if (!host || !port) throw new Error("Invalid configuration received");
-
-        const antennaClient = new AntennaClient(host, port);
-        antennaClient.start();
-    } catch (error) {
-        console.error(`Error fetching configuration from ${API_URL}/ais-configuration: ${error}`);
-        process.exit(1);
-    }
-}
-
-startApp();
+module.exports = { AntennaClient };

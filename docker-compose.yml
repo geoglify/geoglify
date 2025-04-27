@@ -13,7 +13,6 @@ services:
             - 5173:5173
         volumes:
             - ./webapp:/var/www/webapp
-            - node-modules-data:/var/www/webapp/node_modules
             - vendor-data:/var/www/webapp/vendor
         depends_on:
             - database
@@ -54,13 +53,15 @@ services:
         build: ./aisdecoder
         container_name: gaisdecoder
         working_dir: /opt/aisdecoder
-        command: 'node main.js'
+        command: 'node index.js'
         ports:
             - 9002:9002
         environment:
             API_URL: http://webapp/api
             BATCH_SIZE: 1000
             FLUSH_INTERVAL: 1000
+            REDIS_HOST: gredis
+            REDIS_PORT: 6379
         depends_on:
             - webapp
             
@@ -68,10 +69,10 @@ services:
         build: ./aisstream
         container_name: gaisstream
         working_dir: /opt/aisstream
-        command: 'node main.js'
+        command: 'node index.js'
         environment:
             AISSTREAM_API_KEY: ecee1eee9dd77a3f63c44820715217c00f7f3358
-            API_URL: http://webapp/api/ais
+            API_URL: http://webapp/api
             BATCH_SIZE: 1000
             FLUSH_INTERVAL: 1000
         depends_on:

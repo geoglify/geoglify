@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use App\Models\Configuration;
+use Illuminate\Support\Facades\Redis;
 
 class AisServerController extends Controller
 {
@@ -22,10 +23,20 @@ class AisServerController extends Controller
             'ais_port' => 8080,
         ];
 
+        // Save the default settings in the database if they don't exist
         $settings = collect($defaults)->mapWithKeys(function ($default, $key) {
             return [$key => Configuration::where('key', $key)->value('value') ?? $default];
         });
 
+        // Save the settings in Redis
+        $settings->each(function ($value, $key) {
+            Redis::set($key, $value);
+        });
+
+        // Publish a message to Redis to notify other services
+        Redis::publish('config_updates', 'config_changed');
+
+        // Return the Inertia response with the settings
         return Inertia::render('configurations/AisServer', $settings->toArray());
     }
 

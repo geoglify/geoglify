@@ -1,0 +1,20 @@
+# Node.js
+node_modules/
+
+# Package-lock files
+package-lock.json
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependency directories
+pids
+logs
+*.pid
+*.seed
+*.pid.lock
+
+# Environment variables
+.env*

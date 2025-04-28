@@ -52,18 +52,24 @@ const connect = () => {
     eventSource = new EventSource(url);
 
     // Print the connection URL to the console
-    printConsole(`📡 Connecting to AIS server...`);
+    printConsole(`📡 Connecting to API Stream...`);
 
     // Handle connection open event
     eventSource.onopen = () => {
-        connectionState.value = 'connected';
-        printConsole(`✔️ Connected to AIS server!`);
+        printConsole(`✔️ Connected to API Stream!`);
         clearIntervalIfNeeded(); // Ensure no retries are happening when connected
     };
 
     // Handle incoming messages from the EventSource
     eventSource.onmessage = (event) => {
-        printConsole(`Received message: ${event.data}`);
+
+        // Check if the message not contains an error
+        if (!event.data.includes('❌')) {
+            connectionState.value = 'connected';
+        }
+
+        printConsole(`${event.data}`);
+        return;
     };
 
     // Handle connection errors
@@ -196,7 +202,7 @@ onBeforeUnmount(() => {
                     <div class="flex flex-wrap gap-2">
                         <Button type="button" variant="outline" @click="toggleConnection">{{
                             connectionState === 'connected' ? 'Disconnect' : 'Connect'
-                        }}</Button>
+                            }}</Button>
                         <Button type="button" variant="ghost" @click="clearConsole">Clear Console</Button>
                     </div>
                 </div>

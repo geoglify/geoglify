@@ -22,23 +22,31 @@ class AntennaClient {
         return new Promise((resolve) => {
             if (!this.retrying) {
                 this.retrying = true;
-                console.log(
-                    "\nConnecting to:",
-                    this.antennaIp,
-                    this.antennaPort
-                );
-                this.client.connect(this.antennaPort, this.antennaIp);
-                resolve();
+                console.log("\nConnecting to:", this.antennaIp, this.antennaPort);
+                this.client.connect(this.antennaPort, this.antennaIp, () => {
+                    
+                    this.clients.forEach((client) => {
+                        client.write(`data: ✔️ Connected to AIS Source!\n\n`);
+                    });
+                    
+                    resolve();
+                });
             }
         });
     }
 
+    reconnect(newHost, newPort) {
+        console.log(`Reconnecting to new host: ${newHost}:${newPort}`);
+        this.antennaIp = newHost;
+        this.antennaPort = newPort;
+        this.client.destroy();
+        this.client = new net.Socket();
+        this.registerConnectionEvents();
+        this.start();
+    }
+
     handleSocketConnect() {
-        console.log(
-            "Connected to AIS Source:",
-            this.antennaIp,
-            this.antennaPort
-        );
+        console.log("Connected to AIS Source:", this.antennaIp, this.antennaPort);
         this.retrying = false;
 
         const lineReader = readline.createInterface({
@@ -121,6 +129,11 @@ class AntennaClient {
 
     handleSocketClose() {
         console.log("Connection closed:", this.antennaIp, this.antennaPort);
+        
+        this.clients.forEach((client) => {
+            client.write(`data: ❌ Connection closed, retrying...\n\n`);
+        });
+        
         this.retrying = false;
         setTimeout(() => this.connectAntenna(), 5000);
     }
@@ -128,17 +141,32 @@ class AntennaClient {
     handleSocketEnd() {
         console.log("Connection ended:", this.antennaIp, this.antennaPort);
         this.retrying = false;
+        
+        this.clients.forEach((client) => {
+            client.write(`data: ❌ Connection ended, retrying...\n\n`);
+        });
+        
         setTimeout(() => this.connectAntenna(), 5000);
     }
 
     handleSocketTimeout() {
         console.log("Connection timeout:", this.antennaIp, this.antennaPort);
+        
+        this.clients.forEach((client) => {
+            client.write(`data: ❌ Connection timeout, retrying...\n\n`);
+        });
+        
         this.retrying = false;
         if (this.client) this.client.end();
     }
 
     handleSocketError(err) {
         console.error("Connection error:", err.message);
+        
+        this.clients.forEach((client) => {
+            client.write(`data: ❌ Connection error: ${err.message}, retrying...\n\n`);
+        });
+        
         this.retrying = false;
         if (this.client) this.client.destroy();
         setTimeout(() => this.connectAntenna(), 5000);

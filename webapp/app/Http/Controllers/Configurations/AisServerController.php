@@ -33,9 +33,6 @@ class AisServerController extends Controller
             Redis::set($key, $value);
         });
 
-        // Publish a message to Redis to notify other services
-        Redis::publish('config_updates', 'config_changed');
-
         // Return the Inertia response with the settings
         return Inertia::render('configurations/AisServer', $settings->toArray());
     }

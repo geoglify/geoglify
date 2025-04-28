@@ -10,7 +10,6 @@ function startSseServer(clients) {
                 "Access-Control-Allow-Origin": "*",
             });
 
-            res.write("\n");
             clients.push(res);
 
             req.on("close", () => {

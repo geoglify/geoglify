@@ -63,26 +63,4 @@ class AisController extends Controller
             'features' => $features,
         ]);
     }
-    
-    
-    /** 
-     * Get the ais configuration data.
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function config()
-    {
-        // Get the configuration data from the database
-        $config = DB::table('configurations')->whereIn('key', ['ais_host', 'ais_port'])->pluck('value', 'key');
-        
-        // Check if the configuration data is empty
-        if ($config->isEmpty()) {
-            return response()->json(['message' => 'No configuration data found'], 404);
-        }
-        
-        // Return the configuration data as a JSON response
-        return response()->json([
-            'ais_host' => $config->get('ais_host'),
-            'ais_port' => $config->get('ais_port'),
-        ]);
-    }
 }

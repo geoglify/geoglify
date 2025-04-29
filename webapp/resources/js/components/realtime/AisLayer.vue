@@ -20,7 +20,8 @@ export default {
             animationFrameId: null,
             visibilityThreshold: 1000,
             chunkSize: 200,
-            visibleBounds: null
+            visibleBounds: null,
+            latestUpdate: null,
         };
     },
 
@@ -69,12 +70,12 @@ export default {
         },
 
         async processInitialData() {
-            
+
             if (!this.data?.length) return;
 
             const processBatch = async (startIndex) => {
                 const endIndex = Math.min(startIndex + this.chunkSize, this.data.length);
-                
+
                 for (let i = startIndex; i < endIndex; i++) {
                     const ship = this.data[i];
                     this.ships.set(ship.mmsi, this.processShipData(ship));
@@ -127,9 +128,9 @@ export default {
         },
 
         handleRealTimeUpdates(data) {
-            
+
             console.log('Real-time data received:', data);
-            
+
             data.forEach(ship => {
                 if (this.isMapInteracting) {
                     this.tempShipUpdates.set(ship.mmsi, ship);
@@ -151,7 +152,7 @@ export default {
                 this.ships.set(mmsi, this.processShipData(ship));
                 this.scheduleUpdate(mmsi);
             });
-            
+
             this.tempShipUpdates.clear();
         },
 
@@ -166,7 +167,7 @@ export default {
         startUpdateLoop() {
             const update = () => {
                 const now = Date.now();
-                
+
                 if (now - this.lastUpdate >= this.visibilityThreshold && !this.isMapInteracting) {
                     this.updateMapSource();
                     this.lastUpdate = now;
@@ -179,7 +180,7 @@ export default {
         },
 
         updateMapSource() {
-            
+
             if (this.updateQueue.size === 0) return;
 
             let features = [];
@@ -187,13 +188,13 @@ export default {
 
             // Otimização: atualizar apenas navios modificados recentemente
             if (this.ships.size > 5000) {
-                const visibleShips = this.visibleBounds 
-                    ? this.getVisibleShips() 
+                const visibleShips = this.visibleBounds
+                    ? this.getVisibleShips()
                     : Array.from(this.ships.values());
-                
+
                 features = visibleShips
-                    .filter(ship => 
-                        this.updateQueue.has(ship.mmsi) && 
+                    .filter(ship =>
+                        this.updateQueue.has(ship.mmsi) &&
                         updateTime - ship.lastUpdated < 30000
                     )
                     .flatMap(ship => ship.features);
@@ -203,9 +204,19 @@ export default {
                     .flatMap(ship => ship.features);
             }
             
+            console.log(...Array.from(this.ships.values()));
+
+            /*latestUpdate = Math.max(
+                ...Array.from(this.ships.values()).map(ship => ship.last_updated)
+            );*/
+
             if (features.length > 0) {
                 MapHelper.updateSource(this.mapInstance, 'shipSource', features);
             }
+
+            //Emit events for last update and ships count
+            this.$emit('lastUpdate', latestUpdate);
+            this.$emit('shipsCount', this.ships.size);
 
             this.updateQueue.clear();
         },

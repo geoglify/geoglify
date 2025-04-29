@@ -17,7 +17,7 @@ class ShipController extends Controller
         $filters = $request->only(['search', 'sort', 'direction', 'perPage']);
         $sortField = $filters['sort'] ?? 'name';
         $sortDirection = $filters['direction'] ?? 'asc';
-        $perPage = $filters['perPage'] ?? 20;
+        $perPage = $filters['perPage'] ?? 10;
 
         $query = Ship::query()
             ->with(['cargoType.cargoCategory', 'realtimePosition'])

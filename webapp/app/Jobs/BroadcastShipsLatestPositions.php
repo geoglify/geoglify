@@ -10,30 +10,33 @@ use Illuminate\Queue\SerializesModels;
 use App\Events\ShipsLatestPositionsUpdated;
 use App\Models\ShipLatestPositionView;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class BroadcastShipsLatestPositions implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
-        // Processing only ships with last_updated no more than 30 seconds ago
+        $lastBroadcasted = Cache::get('last_ships_broadcasted_at');
+
         $now = now();
-        $lastUpdatedThreshold = $now->subSeconds(30);
-        $ships = ShipLatestPositionView::where('last_updated', '>=', $lastUpdatedThreshold)
-            ->orderBy('last_updated', 'desc')
+        $lastUpdatedThreshold = $now->subSeconds(5);
+
+        // Check if there are any new ship positions to broadcast
+        $ships = ShipLatestPositionView::where('position_updated_at', '>=', $lastBroadcasted ?? $lastUpdatedThreshold)
+            ->orderBy('position_updated_at', 'desc')
             ->get();
 
-        // Chunking the data to avoid memory issues
+        if ($ships->isEmpty()) {
+            Log::info('No new ship positions to broadcast.');
+            return;
+        }
+
+        Cache::put('last_ships_broadcasted_at', $now);
         $chunkSize = 1000;
         $ships->chunk($chunkSize)->each(function ($chunk) {
-
-            Log::info('Broadcasting ships latest positions', ['count' => $chunk->count()]);
-
-            // Broadcasting the chunk of data after mapping
+            Log::info('Broadcasting chunk', ['size' => $chunk->count()]);
             broadcast(new ShipsLatestPositionsUpdated($chunk->toArray()));
         });
     }

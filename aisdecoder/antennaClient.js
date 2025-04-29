@@ -41,6 +41,7 @@ class AntennaClient {
         this.antennaPort = newPort;
         this.client.destroy();
         this.client = new net.Socket();
+        this.client.setMaxListeners(20);
         this.registerConnectionEvents();
         this.start();
     }

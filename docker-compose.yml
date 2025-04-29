@@ -74,8 +74,8 @@ services:
         environment:
             AISSTREAM_API_KEY: ecee1eee9dd77a3f63c44820715217c00f7f3358
             API_URL: http://webapp/api
-            BATCH_SIZE: 1000
-            FLUSH_INTERVAL: 1000
+            BATCH_SIZE: 5000
+            FLUSH_INTERVAL: 5000
         depends_on:
             - webapp
 

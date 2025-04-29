@@ -9,45 +9,60 @@ import { onMounted, ref } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 
 const props = defineProps<{
-  ships: Array<any>;
+    ships: Array<any>;
 }>();
 
 const page = usePage();
 
 const mapSettings = page.props.map as {
-  default_latitude: number;
-  default_longitude: number;
-  default_zoom: number;
-  default_bearing: number;
-  default_style: string;
+    default_latitude: number;
+    default_longitude: number;
+    default_zoom: number;
+    default_bearing: number;
+    default_style: string;
 };
 
-const map = ref<maplibregl.Map | null>(null);
+const map = ref(null);
 const mapIsReady = ref(false);
+const lastUpdate = ref(Date.now());
+const shipsCount = ref(0);
 
 onMounted(() => {
-  if (!map.value) {
-    const isDarkMode = localStorage.getItem('appearance') === 'dark';
-    map.value = MapHelper.createMap('map', mapSettings, isDarkMode);
-
-    map.value.on('load', () => {
-      mapIsReady.value = true;
-    });
-  }
+    if (!map.value) {
+        const isDarkMode = localStorage.getItem('appearance') === 'dark';
+        map.value = MapHelper.createMap('map', mapSettings, isDarkMode);
+        map.value.on('load', () => {
+            mapIsReady.value = true;
+        });
+    }
 });
+
+const handleLastUpdate = (update: any) => {
+    lastUpdate.value = update;
+};
+
+const handleShipsCount = (count: number) => {
+    shipsCount.value = count;
+};
+
 </script>
 
 <template>
     <div id="map" class="rounded-br-lg rounded-bl-lg"></div>
-  
+
     <div class="absolute top-0 right-0 z-10 p-4">
-      <Badge>
-        <Ship class="mr-2 h-4 w-4" />
-        <span>{{ props.ships.length }} Ships</span>
-      </Badge>
+        <Badge variant="secondary" class="bg-black text-white">
+            <Ship class="mr-2 h-4 w-4" /> {{ shipsCount }} Ships
+        </Badge>
+
+        Last Update:
+        <span class="text-gray-500">
+            {{ new Date(lastUpdate).toLocaleTimeString() }}
+        </span>
     </div>
-  
-    <AisLayer :mapInstance="map" :data="props.ships" v-if="mapIsReady" />
+
+    <AisLayer :mapInstance="map" :data="props.ships" v-if="mapIsReady" @lastUpdate="handleLastUpdate"
+        @shipsCount="handleShipsCount" />
 </template>
 
 <style>

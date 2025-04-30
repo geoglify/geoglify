@@ -61,8 +61,7 @@ const handleShipsCount = (count: number) => {
         </span>
     </div>
 
-    <AisLayer :mapInstance="map" :data="props.ships" v-if="mapIsReady" @lastUpdate="handleLastUpdate"
-        @shipsCount="handleShipsCount" />
+    <AisLayer :mapInstance="map" :data="props.ships" v-if="mapIsReady" @lastUpdate="handleLastUpdate" @shipsCount="handleShipsCount" />
 </template>
 
 <style>

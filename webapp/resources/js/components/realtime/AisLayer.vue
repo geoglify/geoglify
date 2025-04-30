@@ -2,7 +2,7 @@
     <div></div>
 </template>
 
-<script lang="js">
+<script lang="ts">
 import MapHelper from '@/helpers/map';
 import ShipHelper from "@/helpers/ships";
 import { throttle } from 'lodash-es';
@@ -16,12 +16,17 @@ export default {
             lastUpdate: Date.now(),
             isMapInteracting: false,
             tempShipUpdates: new Map(),
-            updateQueue: new Set(),
-            animationFrameId: null,
-            visibilityThreshold: 1000,
+            animationFrameId: 0,
+            visibilityThreshold: 5000,
             chunkSize: 200,
             visibleBounds: null,
-            latestUpdate: null,
+            latestUpdate: null as Date | null,
+            cleanupInterval: 0,
+            layerEventHandlers: {} as { click?: (e: any) => void },
+            echoChannel: null,
+            throttledUpdateVisibleBounds: null,
+            isUpdatingMap: false,
+            lastMapUpdate: 0
         };
     },
 
@@ -30,11 +35,13 @@ export default {
         await this.processInitialData();
         this.setupEventListeners();
         this.startUpdateLoop();
+        this.cleanupInterval = setInterval(this.cleanupOldShips, 60 * 1000);
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
         this.cleanupEventListeners();
         cancelAnimationFrame(this.animationFrameId);
+        clearInterval(this.cleanupInterval);
     },
 
     methods: {
@@ -70,7 +77,6 @@ export default {
         },
 
         async processInitialData() {
-
             if (!this.data?.length) return;
 
             const processBatch = async (startIndex) => {
@@ -79,7 +85,6 @@ export default {
                 for (let i = startIndex; i < endIndex; i++) {
                     const ship = this.data[i];
                     this.ships.set(ship.mmsi, this.processShipData(ship));
-                    this.scheduleUpdate(ship.mmsi);
                 }
 
                 if (endIndex < this.data.length) {
@@ -128,32 +133,26 @@ export default {
         },
 
         handleRealTimeUpdates(data) {
-
-            console.log('Real-time data received:', data);
-
             data.forEach(ship => {
+                const processedShip = this.processShipData(ship);
                 if (this.isMapInteracting) {
-                    this.tempShipUpdates.set(ship.mmsi, ship);
+                    this.tempShipUpdates.set(ship.mmsi, processedShip);
                 } else {
-                    this.ships.set(ship.mmsi, this.processShipData(ship));
-                    this.scheduleUpdate(ship.mmsi);
+                    this.ships.set(ship.mmsi, processedShip);
                 }
             });
-        },
-
-        scheduleUpdate(mmsi) {
-            this.updateQueue.add(mmsi);
         },
 
         applyPendingUpdates() {
             if (this.tempShipUpdates.size === 0) return;
 
             this.tempShipUpdates.forEach((ship, mmsi) => {
-                this.ships.set(mmsi, this.processShipData(ship));
-                this.scheduleUpdate(mmsi);
+                this.ships.set(mmsi, ship);
             });
 
             this.tempShipUpdates.clear();
+
+            this.updateMapSource(true);
         },
 
         updateVisibleBounds() {
@@ -165,60 +164,60 @@ export default {
         },
 
         startUpdateLoop() {
-            const update = () => {
-                const now = Date.now();
-
-                if (now - this.lastUpdate >= this.visibilityThreshold && !this.isMapInteracting) {
+            this.animationFrameId = setInterval(() => {
+                if (!this.isMapInteracting) {
                     this.updateMapSource();
-                    this.lastUpdate = now;
                 }
-
-                this.animationFrameId = requestAnimationFrame(update);
-            };
-
-            update();
+            }, 5000);
         },
 
-        updateMapSource() {
-
-            if (this.updateQueue.size === 0) return;
-
-            let features = [];
-            const updateTime = Date.now();
-
-            // Otimização: atualizar apenas navios modificados recentemente
-            if (this.ships.size > 5000) {
-                const visibleShips = this.visibleBounds
-                    ? this.getVisibleShips()
-                    : Array.from(this.ships.values());
-
-                features = visibleShips
-                    .filter(ship =>
-                        this.updateQueue.has(ship.mmsi) &&
-                        updateTime - ship.lastUpdated < 30000
-                    )
-                    .flatMap(ship => ship.features);
-            } else {
-                features = Array.from(this.ships.values())
-                    .filter(ship => this.updateQueue.has(ship.mmsi))
-                    .flatMap(ship => ship.features);
+        cleanupOldShips() {
+            const twoHoursAgo = Date.now() - 2 * 60 * 60 * 1000;
+            let changed = false;
+            for (const [mmsi, ship] of this.ships.entries()) {
+                if (ship.lastUpdated < twoHoursAgo) {
+                    this.ships.delete(mmsi);
+                    changed = true;
+                }
             }
-            
-            console.log(...Array.from(this.ships.values()));
+            if (changed) {
+                console.log(`Cleanup removed old ships. Current count: ${this.ships.size}`);
+            }
+        },
 
-            /*latestUpdate = Math.max(
-                ...Array.from(this.ships.values()).map(ship => ship.last_updated)
-            );*/
+        updateMapSource(force = false) {
+            if (this.isUpdatingMap) return;
 
-            if (features.length > 0) {
-                MapHelper.updateSource(this.mapInstance, 'shipSource', features);
+            const now = Date.now();
+            const timeSinceLast = now - this.lastMapUpdate;
+
+            if (!force && timeSinceLast < this.visibilityThreshold) return;
+
+            this.isUpdatingMap = true;
+            const start = performance.now();
+
+            const features = [];
+
+            for (const ship of this.ships.values()) {
+                if (ship.features && ship.features.length) {
+                    features.push(...ship.features);
+                }
             }
 
-            //Emit events for last update and ships count
-            this.$emit('lastUpdate', latestUpdate);
+            MapHelper.updateSource(this.mapInstance, 'shipSource', features);
+
+            this.latestUpdate = features.length
+                ? new Date(Math.max(...Array.from(this.ships.values()).map(ship => ship.lastUpdated)))
+                : null;
+
+            this.$emit('lastUpdate', this.latestUpdate);
             this.$emit('shipsCount', this.ships.size);
 
-            this.updateQueue.clear();
+            const duration = performance.now() - start;
+            console.log(`[updateMapSource] Took ${duration.toFixed(2)} ms for ${features.length} features and ${this.ships.size} total ships`);
+
+            this.isUpdatingMap = false;
+            this.lastMapUpdate = now;
         },
 
         getVisibleShips() {

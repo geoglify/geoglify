@@ -22,8 +22,13 @@ class AisController extends Controller
             return response()->json(['message' => 'No data to process'], 400);
         }
 
-        // Dispatch the job to process the AIS data
-        StoreAisData::dispatch($aisData);
+        // Dispatch the job to process the AIS data by chunks of 100
+        $aisDataChunks = array_chunk($aisData, 100);
+        
+        foreach ($aisDataChunks as $chunk) {
+            // Dispatch the job for each chunk
+            StoreAisData::dispatch($chunk);
+        }
 
         return response()->json(['message' => 'Data processing started'], 202);
     }

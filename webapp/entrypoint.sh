@@ -6,6 +6,9 @@ BASEDIR=/var/www/webapp
 # Remove Cache
 rm -rf $BASEDIR/bootstrap/cache/*
 
+# Clear laravel.log
+rm -rf $BASEDIR/storage/logs/laravel.log
+
 # Flag to check if it's a fresh install
 FIRST_INSTALL=false
 

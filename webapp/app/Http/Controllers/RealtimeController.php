@@ -12,9 +12,7 @@ class RealtimeController extends Controller
      */
     public function index()
     {
-        $ships = ShipLatestPositionView::limit(1000)
-            ->orderBy('position_updated_at', 'desc')
-            ->get();
+        $ships = ShipLatestPositionView::all();
         
         return Inertia::render('realtime/Index', [
             'ships' => $ships,

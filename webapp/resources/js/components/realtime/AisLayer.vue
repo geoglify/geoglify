@@ -19,12 +19,10 @@ export default {
             animationFrameId: 0,
             visibilityThreshold: 5000,
             chunkSize: 200,
-            visibleBounds: null,
             latestUpdate: null as Date | null,
             cleanupInterval: 0,
             layerEventHandlers: {} as { click?: (e: any) => void },
             echoChannel: null,
-            throttledUpdateVisibleBounds: null,
             isUpdatingMap: false,
             lastMapUpdate: 0
         };
@@ -121,18 +119,14 @@ export default {
                 this.mapInstance.on(event, () => {
                     this.isMapInteracting = false;
                     this.applyPendingUpdates();
-                    this.updateVisibleBounds();
                 });
             });
-
-            this.throttledUpdateVisibleBounds = throttle(() => {
-                this.updateVisibleBounds();
-            }, 500);
-
-            this.mapInstance.on('move', this.throttledUpdateVisibleBounds);
         },
 
         handleRealTimeUpdates(data) {
+            
+            console.log('Realtime data received length:', data.length);
+            
             data.forEach(ship => {
                 const processedShip = this.processShipData(ship);
                 if (this.isMapInteracting) {
@@ -153,14 +147,6 @@ export default {
             this.tempShipUpdates.clear();
 
             this.updateMapSource(true);
-        },
-
-        updateVisibleBounds() {
-            try {
-                this.visibleBounds = this.mapInstance.getBounds();
-            } catch (error) {
-                console.warn('Could not update map bounds:', error);
-            }
         },
 
         startUpdateLoop() {
@@ -220,24 +206,9 @@ export default {
             this.lastMapUpdate = now;
         },
 
-        getVisibleShips() {
-            return Array.from(this.ships.values()).filter(ship => {
-                try {
-                    return this.visibleBounds.contains([ship.longitude, ship.latitude]);
-                } catch (error) {
-                    console.warn('Error checking ship visibility:', error);
-                    return false;
-                }
-            });
-        },
-
         cleanupEventListeners() {
             if (this.echoChannel) {
                 window.Echo.leaveChannel('ships.latest_positions');
-            }
-
-            if (this.throttledUpdateVisibleBounds) {
-                this.mapInstance.off('move', this.throttledUpdateVisibleBounds);
             }
 
             if (this.layerEventHandlers?.click) {

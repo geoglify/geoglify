@@ -2,9 +2,9 @@ import { createApp, h } from "vue";
 import { createInertiaApp } from "@inertiajs/vue3";
 
 // Vuetify
-import '@mdi/font/css/materialdesignicons.css'
-import 'vuetify/styles'
-import { createVuetify } from 'vuetify'
+import "@mdi/font/css/materialdesignicons.css";
+import "vuetify/styles";
+import { createVuetify } from "vuetify";
 
 const vuetify = createVuetify();
 

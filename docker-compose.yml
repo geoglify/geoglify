@@ -1,0 +1,63 @@
+services:
+
+  #LARAVEL
+  webapp:
+    build: ./webapp
+    tty: true
+    ports:
+      - "5173:5173"
+    working_dir: /var/www
+    volumes:
+      - ./webapp/:/var/www
+      - ./docker/development/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+      - ./docker/development/supervisord/supervisord.conf:/etc/supervisord.conf
+      - vendor:/var/www/vendor
+      - node_modules:/var/www/node_modules
+    env_file:
+      - ./webapp/.env
+    networks:
+      - app-network
+
+  #PostgreSQL
+  database:
+    image: postgres:17.5
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=app
+      - POSTGRES_USER=laravel
+      - POSTGRES_PASSWORD=secret
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  redis:
+    image: redis:alpine
+    networks:
+      - app-network
+
+  #Nginx
+  webserver:
+    image: nginx:alpine
+    container_name: webserver
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "8000:8000"
+      - "443:443"
+    volumes:
+      - ./webapp/:/var/www
+      - ./docker/development/nginx/:/etc/nginx/conf.d/
+    networks:
+      - app-network
+
+#Networks
+networks:
+  app-network:
+    driver: bridge
+#Volumes
+volumes:
+  dbdata:
+  vendor:
+  node_modules:

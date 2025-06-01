@@ -20,12 +20,12 @@ services:
 
   #PostgreSQL
   database:
-    image: postgres:17.5
+    image: pgrouting/pgrouting:17-3.5-main
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_DB=app
-      - POSTGRES_USER=laravel
+      - POSTGRES_DB=geoglify
+      - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=secret
     volumes:
       - dbdata:/var/lib/postgresql/data

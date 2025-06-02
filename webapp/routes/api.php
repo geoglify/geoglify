@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\LayerController;
 use App\Http\Controllers\Api\FeatureController;
 
-Route::prefix('api')->group(function () {
+Route::prefix('v1')->group(function () {
     Route::get('/layers', [LayerController::class, 'index'])->name('api.layers.index');
     Route::post('/layers', [LayerController::class, 'store'])->name('api.layers.store');
     Route::get('/layers/{id}', [LayerController::class, 'show'])->name('api.layers.show');

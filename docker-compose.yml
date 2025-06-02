@@ -15,6 +15,9 @@ services:
       - node_modules:/var/www/node_modules
     env_file:
       - ./webapp/.env
+    depends_on:
+      - database
+      - redis
     networks:
       - app-network
 

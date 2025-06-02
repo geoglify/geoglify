@@ -10,8 +10,6 @@ class Layer extends Model
 {
     use HasUserAudit, SoftDeletes;
 
-    protected $table = 'layers';
-
     protected $fillable = [
         'name',
         'description',
@@ -35,5 +33,10 @@ class Layer extends Model
     public function deleter()
     {
         return $this->belongsTo(User::class, 'deleted_by');
+    }
+
+    public function features()
+    {
+        return $this->hasMany(Feature::class);
     }
 }

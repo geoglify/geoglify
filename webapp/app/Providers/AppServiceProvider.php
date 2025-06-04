@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
-
 use Illuminate\Support\Str;
 use Dedoc\Scramble\Scramble;
 use Illuminate\Routing\Route;
@@ -23,7 +23,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Scramble::configure()->routes(function (Route $route) {
+        Vite::prefetch(concurrency: 3);
+
+         Scramble::configure()->routes(function (Route $route) {
             return Str::startsWith($route->uri, 'api/');
         });
     }

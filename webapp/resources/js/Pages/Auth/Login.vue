@@ -40,25 +40,45 @@ export default {
         <Head title="Log in" />
 
         <form>
-            <div class="mt-4">
-                <v-text-field v-model="form.email" label="Email" outlined dense required autofocus variant="outlined"
-                    autocomplete="username" :error-messages="form.errors.email" hide-details="auto"></v-text-field>
+            <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
+                <span class="text-caption font-weight-bold">Email</span>
+            </div>
+            <v-text-field v-model="form.email" density="compact" placeholder="Email address"
+                prepend-inner-icon="mdi-email-outline" variant="outlined" required autofocus autocomplete="username"
+                :error-messages="form.errors.email" hide-details="auto">
+            </v-text-field>
+
+            <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between mt-4">
+                <span class="text-caption font-weight-bold">Password</span>
+                <a v-if="canResetPassword" class="text-caption text-decoration-none text-blue"
+                    rel="noopener noreferrer" :href="route('password.request')">
+                    Forgot login password?
+                </a>
             </div>
 
-            <div class="mt-4">
-                <v-text-field v-model="form.password" label="Password" outlined dense required variant="outlined"
-                    autocomplete="current-password" :type="showPassword ? 'text' : 'password'"
-                    :error-messages="form.errors.password" hide-details="auto"
-                    @click:append-inner="() => (showPassword = !showPassword)" :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'
-                        "></v-text-field>
-            </div>
+            <v-text-field v-model="form.password" :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+                :type="showPassword ? 'text' : 'password'" density="compact" placeholder="Enter your password"
+                prepend-inner-icon="mdi-lock-outline" variant="outlined" required autocomplete="current-password"
+                :error-messages="form.errors.password" hide-details="auto"
+                @click:append-inner="() => (showPassword = !showPassword)">
+            </v-text-field>
 
-            <div class="flex items-center justify-end mt-4">
-                <v-btn :class="{ 'opacity-25': form.processing }" :readonly="form.processing" @click.prevent="submit"
-                    color="primary" elevation="0" block size="large" class="text-none">
-                    Login
-                </v-btn>
-            </div>
+            <v-card class="mb-4 mt-4" color="surface-variant" variant="tonal">
+                <v-card-text class="text-medium-emphasis text-caption">
+                    Warning: After 3 consecutive failed login attempts, you account will be temporarily locked for three
+                    hours. If you must login now, you can also click "Forgot login password?" below to reset the login
+                    password.
+                </v-card-text>
+            </v-card>
+
+            <v-btn :class="{ 'opacity-25': form.processing }" :readonly="form.processing" @click.prevent="submit"
+                color="primary" size="large" elevation="0" block class="text-none">
+                Log In
+            </v-btn>
+
+            <v-btn color="primary" size="small" class="mt-2" variant="text" block :href="route('register')">
+                Sign up
+            </v-btn>
         </form>
     </GuestLayout>
 </template>

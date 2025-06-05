@@ -55,6 +55,8 @@ services:
       - ./docker/development/nginx/:/etc/nginx/conf.d/
     networks:
       - app-network
+    depends_on:
+      - webapp
 
 #Networks
 networks:

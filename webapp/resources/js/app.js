@@ -14,7 +14,20 @@ import { createVuetify } from "vuetify";
 // Laravel Echo
 import "./echo";
 
-const vuetify = createVuetify();
+const vuetify = createVuetify({
+    theme: {
+        defaultTheme: "light",
+        themes: {
+            light: {
+                colors: {
+                    primary: "#4B5563",
+                    secondary: "#9CA3AF",
+                    accent: "#F59E0B",
+                },
+            },
+        },
+    },
+});
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 

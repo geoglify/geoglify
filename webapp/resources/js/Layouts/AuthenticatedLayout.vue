@@ -4,7 +4,11 @@ import { ref } from 'vue';
 
 <template>
     <div class="bg-yellow min-h-screen flex items-center justify-center p-8">
-        <slot />
+
+        <v-card class="mx-auto pa-8" elevation="0" width="448" rounded="xs">
+            <slot />
+        </v-card>
+
         <div class="absolute bottom-2 w-full text-center px-8">
             <p class="text-xs">
                 Powered by Geoglify v1.0.0 - {{ new Date().getFullYear() }}

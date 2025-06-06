@@ -14,6 +14,12 @@ import { createVuetify } from "vuetify";
 // Laravel Echo
 import "./echo";
 
+// i18n
+import i18n from "./i18n";
+
+// Country Flag
+import CountryFlag from "vue-country-flag-next";
+
 const vuetify = createVuetify({
     theme: {
         defaultTheme: "light",
@@ -42,6 +48,8 @@ createInertiaApp({
         return createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(ZiggyVue)
+            .use(i18n)
+            .component("CountryFlag", CountryFlag)
             .use(vuetify)
             .mount(el);
     },

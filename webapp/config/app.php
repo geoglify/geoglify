@@ -1,5 +1,7 @@
 <?php
 
+use LaravelLang\LocaleList\Locale;
+
 return [
 
     /*
@@ -78,9 +80,9 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    'locale' => Locale::Portuguese->value,
 
-    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+    'fallback_locale' => Locale::English->value,
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 

@@ -29,11 +29,10 @@ export default {
 <template>
     <GuestLayout>
 
-        <Head title="Forgot Password" />
+        <Head :title="$t('custom.forgot_password')" />
 
         <div class="mb-4 text-sm text-gray-600">
-            Forgot your password? No problem. Just let us know your email address and we will email you a password reset
-            link that will allow you to choose a new one.
+            {{ $t('custom.forgot_password_instructions') }}
         </div>
 
         <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
@@ -42,20 +41,19 @@ export default {
 
         <form>
             <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
-                <span class="text-caption font-weight-bold">Email</span>
+                <span class="text-caption font-weight-bold">{{ $t('custom.email') }}</span>
             </div>
-            <v-text-field v-model="form.email" density="compact" placeholder="Email address"
+            <v-text-field v-model="form.email" density="compact" :placeholder="$t('custom.email_address')"
                 prepend-inner-icon="mdi-email-outline" variant="outlined" required autofocus autocomplete="username"
-                :error-messages="form.errors.email" hide-details="auto">
-            </v-text-field>
+                :error-messages="form.errors.email" hide-details="auto" />
 
             <v-btn :class="{ 'opacity-25': form.processing }" :readonly="form.processing" @click.prevent="submit"
                 color="primary" size="large" elevation="0" block class="text-none mt-6">
-                Email Password Reset Link
+                {{ $t('custom.email_password_reset_link') }}
             </v-btn>
 
             <v-btn :href="route('login')" color="primary" size="small" class="mt-2" variant="text" block>
-                Back to Login
+                {{ $t('custom.back_to_login') }}
             </v-btn>
         </form>
     </GuestLayout>

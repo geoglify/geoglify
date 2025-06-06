@@ -38,6 +38,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $user,
             ],
             'csrf_token' => $request->session()->token(),
+            'locale' => app()->getLocale(),
             'ziggy' => fn() => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),

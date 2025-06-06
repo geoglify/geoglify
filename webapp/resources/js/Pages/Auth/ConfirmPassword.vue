@@ -27,18 +27,18 @@ export default {
 <template>
     <GuestLayout>
 
-        <Head title="Confirm Password" />
+        <Head :title="$t('custom.confirm_password_title')" />
 
         <div class="mb-4 text-sm text-gray-600">
-            This is a secure area of the application. Please confirm your password before continuing.
+            {{ $t('custom.confirm_password_instructions') }}
         </div>
 
         <form>
             <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
-                <span class="text-caption font-weight-bold">Password</span>
+                <span class="text-caption font-weight-bold">{{ $t('custom.password') }}</span>
             </div>
             <v-text-field v-model="form.password" :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
-                :type="showPassword ? 'text' : 'password'" density="compact" placeholder="Enter your password"
+                :type="showPassword ? 'text' : 'password'" density="compact" :placeholder="$t('custom.enter_password')"
                 prepend-inner-icon="mdi-lock-outline" variant="outlined" required autofocus
                 autocomplete="current-password" :error-messages="form.errors.password" hide-details="auto"
                 @click:append-inner="() => (showPassword = !showPassword)">
@@ -46,7 +46,7 @@ export default {
 
             <v-btn :class="{ 'opacity-25': form.processing }" :readonly="form.processing" @click.prevent="submit"
                 color="primary" size="large" elevation="0" block class="text-none mt-6">
-                Confirm
+                {{ $t('custom.confirm') }}
             </v-btn>
         </form>
     </GuestLayout>

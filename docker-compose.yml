@@ -58,6 +58,18 @@ services:
     depends_on:
       - webapp
 
+  mailpit:
+    image: axllent/mailpit
+    container_name: mailpit
+    restart: unless-stopped
+    volumes:
+      - ./data:/data
+    ports:
+      - 8025:8025
+      - 1025:1025
+    networks:
+      - app-network
+
 #Networks
 networks:
   app-network:

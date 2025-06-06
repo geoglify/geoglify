@@ -41,41 +41,39 @@ export default {
 <template>
     <GuestLayout>
 
-        <Head title="Reset Password" />
+        <Head :title="$t('custom.reset_password')" />
 
         <form>
             <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
-                <span class="text-caption font-weight-bold">Email</span>
+                <span class="text-caption font-weight-bold">{{ $t('custom.email') }}</span>
             </div>
-            <v-text-field v-model="form.email" density="compact" placeholder="Email address"
+            <v-text-field v-model="form.email" density="compact" :placeholder="$t('custom.email_address')"
                 prepend-inner-icon="mdi-email-outline" variant="outlined" required autofocus autocomplete="username"
-                :error-messages="form.errors.email" hide-details="auto">
-            </v-text-field>
+                :error-messages="form.errors.email" hide-details="auto" />
 
             <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between mt-4">
-                <span class="text-caption font-weight-bold">New Password</span>
+                <span class="text-caption font-weight-bold">{{ $t('custom.new_password') }}</span>
             </div>
             <v-text-field v-model="form.password" :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
-                :type="showPassword ? 'text' : 'password'" density="compact" placeholder="Enter your new password"
-                prepend-inner-icon="mdi-lock-outline" variant="outlined" required autocomplete="new-password"
-                :error-messages="form.errors.password" hide-details="auto"
-                @click:append-inner="() => (showPassword = !showPassword)">
-            </v-text-field>
+                :type="showPassword ? 'text' : 'password'" density="compact"
+                :placeholder="$t('custom.enter_new_password')" prepend-inner-icon="mdi-lock-outline" variant="outlined"
+                required autocomplete="new-password" :error-messages="form.errors.password" hide-details="auto"
+                @click:append-inner="() => (showPassword = !showPassword)" />
 
             <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between mt-4">
-                <span class="text-caption font-weight-bold">Confirm Password</span>
+                <span class="text-caption font-weight-bold">{{ $t('custom.confirm_password') }}</span>
             </div>
             <v-text-field v-model="form.password_confirmation"
                 :append-inner-icon="showPasswordConfirmation ? 'mdi-eye-off' : 'mdi-eye'"
                 :type="showPasswordConfirmation ? 'text' : 'password'" density="compact"
-                placeholder="Confirm your new password" prepend-inner-icon="mdi-lock-check-outline" variant="outlined"
-                required autocomplete="new-password" :error-messages="form.errors.password_confirmation"
-                hide-details="auto" @click:append-inner="() => (showPasswordConfirmation = !showPasswordConfirmation)">
-            </v-text-field>
+                :placeholder="$t('custom.confirm_new_password')" prepend-inner-icon="mdi-lock-check-outline"
+                variant="outlined" required autocomplete="new-password"
+                :error-messages="form.errors.password_confirmation" hide-details="auto"
+                @click:append-inner="() => (showPasswordConfirmation = !showPasswordConfirmation)" />
 
             <v-btn :class="{ 'opacity-25': form.processing }" :readonly="form.processing" @click.prevent="submit"
                 color="primary" size="large" elevation="0" block class="text-none mt-6">
-                Reset Password
+                {{ $t('custom.reset_password') }}
             </v-btn>
         </form>
     </GuestLayout>

@@ -33,27 +33,25 @@ export default {
 <template>
     <GuestLayout>
 
-        <Head title="Email Verification" />
+        <Head :title="$t('custom.email_verification')" />
 
         <div class="mb-4 text-sm text-gray-600">
-            Thanks for signing up! Before getting started, could you verify your email address by clicking on the link
-            we just emailed to you? If you didn't receive the email, we will gladly send you another.
+            {{ $t('custom.email_verification_intro') }}
         </div>
 
         <div v-if="status === 'verification-link-sent'" class="mb-4 font-medium text-sm text-green-600">
-            A new verification link has been sent to the email address you provided during registration.
+            {{ $t('custom.email_verification_sent') }}
         </div>
 
         <form>
             <v-btn :class="{ 'opacity-25': form.processing }" :readonly="form.processing" @click.prevent="submit"
                 color="primary" size="large" elevation="0" block class="text-none mb-4">
-                Resend Verification Email
+                {{ $t('custom.resend_verification') }}
             </v-btn>
 
-             <v-btn color="primary" size="small" class="mt-2" variant="text" block @click.prevent="logout">
-                Log Out
+            <v-btn color="primary" size="small" class="mt-2" variant="text" block @click.prevent="logout">
+                {{ $t('custom.logout') }}
             </v-btn>
-
         </form>
     </GuestLayout>
 </template>

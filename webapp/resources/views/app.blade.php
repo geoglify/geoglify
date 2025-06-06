@@ -14,6 +14,11 @@
     @routes
     @vite(['resources/js/app.js', 'resources/css/app.css'])
     @inertiaHead
+
+    <script>
+        window.translations = {!! json_encode($translations) !!};
+        window.__locale = '{{ $locale }}';
+    </script>
 </head>
 
 <body class="antialiased">

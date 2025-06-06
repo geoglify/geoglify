@@ -37,7 +37,7 @@ export default {
             <v-list-item class="pa-0 ma-0 my-3">
                 <template v-slot:title>
                     <span class="font-weight-black text-uppercase pa-0 ma-0" style="font-size: 22px">Geoglify</span>{{
-                    form.locale }}
+                    $page.props.locale }}
                 </template>
             </v-list-item>
             <slot />

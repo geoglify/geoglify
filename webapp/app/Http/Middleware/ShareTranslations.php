@@ -51,9 +51,6 @@ class ShareTranslations
             $translations[$key] = trans($key);
         }
 
-        // Read /lang/{locale}.json and merge translations
-        $jsonFilePath = base_path("lang/{$locale}.json");
-
         return $translations;
     }
 }

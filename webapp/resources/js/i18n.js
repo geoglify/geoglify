@@ -1,14 +1,10 @@
 import { createI18n } from "vue-i18n";
 
-// Import all translations
-const messages = {
-    [window.__locale]: window.translations, // Translations for the current locale
-};
-
 const i18n = createI18n({
-    locale: window.__locale,
+    legacy: false,
+    locale: "pt",
     fallbackLocale: "en",
-    messages,
+    messages: {},
 });
 
 export default i18n;

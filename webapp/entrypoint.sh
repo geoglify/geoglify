@@ -27,6 +27,9 @@ php artisan view:clear
 # Run migrations
 php artisan migrate --force
 
+# Export language files
+php artisan lang:export
+
 # Build vite assets
 if [ "$APP_ENV" = "production" ]; then
     echo "Building Vite assets for production..."

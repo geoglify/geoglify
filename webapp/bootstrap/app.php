@@ -17,8 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SetLocale::class,
             \LaravelLang\Routes\Middlewares\LocalizationByParameter::class,
             \App\Http\Middleware\HandleInertiaRequests::class,
-            \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
-            \App\Http\Middleware\ShareTranslations::class,
+            \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -16,6 +16,9 @@ import "./echo";
 
 // i18n
 import i18n from "./i18n";
+import { loadLocale } from "./i18n-loader";
+
+const initialLocale = window.__locale || "pt";
 
 // Country Flag
 import CountryFlag from "vue-country-flag-next";
@@ -45,13 +48,15 @@ createInertiaApp({
             import.meta.glob("./Pages/**/*.vue")
         ),
     setup({ el, App, props, plugin }) {
-        return createApp({ render: () => h(App, props) })
-            .use(plugin)
-            .use(ZiggyVue)
-            .use(i18n)
-            .component("CountryFlag", CountryFlag)
-            .use(vuetify)
-            .mount(el);
+        loadLocale(initialLocale).then(() => {
+            return createApp({ render: () => h(App, props) })
+                .use(plugin)
+                .use(ZiggyVue)
+                .use(i18n)
+                .component("CountryFlag", CountryFlag)
+                .use(vuetify)
+                .mount(el);
+        });
     },
     progress: {
         color: "#4B5563",

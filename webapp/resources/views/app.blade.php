@@ -16,7 +16,6 @@
     @inertiaHead
 
     <script>
-        window.translations = {!! json_encode($translations) !!};
         window.__locale = '{{ $locale }}';
     </script>
 </head>

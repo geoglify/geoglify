@@ -8,5 +8,9 @@
 @source '../**/*.js';
 
 * {
-    font-family: Nunito, sans-serif !important;
+    font-family: Inter, sans-serif, -apple-system, blinkmacsystemfont, Segoe UI,
+        roboto, Helvetica Neue, arial, sans-serif, "Apple Color Emoji",
+        "Segoe UI Emoji", Segoe UI Symbol !important;
+    text-rendering: optimizeLegibility !important;
+    -webkit-font-smoothing: antialiased !important;
 }

@@ -1,9 +1,5 @@
-<script setup>
-import GuestLayout from "@/Layouts/GuestLayout.vue";
-</script>
-
 <script>
-import { Head, useForm } from "@inertiajs/vue3";
+import { useForm } from "@inertiajs/vue3";
 
 export default {
     data() {
@@ -66,7 +62,6 @@ textarea:-webkit-autofill,
 select:-webkit-autofill {
     transition: background-color 5000s ease-in-out 0s !important;
     font-size: 14px !important;
-    font-family: "Nunito", sans-serif !important;
     -webkit-text-fill-color: black !important;
     color: black;
 }

@@ -7,7 +7,6 @@ import { createApp, h } from "vue";
 import { ZiggyVue } from "../../vendor/tightenco/ziggy";
 
 // Vuetify
-import "@mdi/font/css/materialdesignicons.css";
 import "vuetify/styles";
 import { createVuetify } from "vuetify";
 
@@ -38,6 +37,9 @@ const vuetify = createVuetify({
     },
 });
 
+// Iconify
+import { Icon } from "@iconify/vue";
+
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
 createInertiaApp({
@@ -53,6 +55,7 @@ createInertiaApp({
                 .use(plugin)
                 .use(ZiggyVue)
                 .use(i18n)
+                .component("Icon", Icon)
                 .component("CountryFlag", CountryFlag)
                 .use(vuetify)
                 .mount(el);

@@ -10,14 +10,11 @@ import { Head } from '@inertiajs/vue3';
     <AuthenticatedLayout>
 
         <form>
-            
-            <div class="text-gray-900 text-center ">
-               Welcome <b>{{ $page.props.auth.user.name }}</b> to your dashboard!
+
+            <div class="text-center text-h6">
+                Welcome <b>{{ $page.props.auth.user.name }}</b> to your dashboard!
             </div>
-            <!-- logout -->
-            <v-btn class="mt-6" @click="$inertia.post(route('logout'))" size="large" color="primary" elevation="0"
-                block>Logout</v-btn>
-                
+
         </form>
     </AuthenticatedLayout>
 </template>

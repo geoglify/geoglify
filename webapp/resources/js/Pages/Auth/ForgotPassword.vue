@@ -44,8 +44,13 @@ export default {
                 <span class="text-caption font-weight-bold">{{ $t('custom.email') }}</span>
             </div>
             <v-text-field v-model="form.email" density="compact" :placeholder="$t('custom.email_address')"
-                prepend-inner-icon="mdi-email-outline" variant="outlined" required autofocus autocomplete="username"
-                :error-messages="form.errors.email" hide-details="auto" />
+                variant="outlined" required autofocus autocomplete="username" :error-messages="form.errors.email"
+                hide-details="auto">
+                <template v-slot:prepend-inner>
+                    <Icon icon="mdi:email-outline"
+                        style="font-size:24px;font-style:italic;height:24px;opacity:0.4" />
+                </template>
+            </v-text-field>
 
             <v-btn :class="{ 'opacity-25': form.processing }" :readonly="form.processing" @click.prevent="submit"
                 color="primary" size="large" elevation="0" block class="text-none mt-6">

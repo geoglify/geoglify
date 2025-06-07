@@ -45,4 +45,20 @@ return [
     'verification_link_sent' => 'A new verification link has been sent to the email address you provided during registration.',
     'resend_verification_email' => 'Resend Verification Email',
     'log_out' => 'Log Out',
+
+    // Sidebar.vue
+    'map' => 'Map',
+    'layers' => 'Layers',
+    'users' => 'Users',
+    'roles' => 'Roles',
+    'permissions' => 'Permissions',
+    'settings' => 'Settings',
+    'dashboard' => 'Dashboard',
+    'live-data' => 'Live Data',
+    'assets' => 'Assets',
+    'alerts' => 'Alerts',
+    'history' => 'History',
+    'simulations' => 'Simulations',
+    'analytics' => 'Analytics',
+    'integrations' => 'Integrations',
 ];

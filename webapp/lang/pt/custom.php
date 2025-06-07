@@ -48,4 +48,21 @@ return [
 
     // DeleteUserForm.vue
     'delete_account' => 'Eliminar Conta',
+
+    // Sidebar.vue
+    'map' => 'Mapa',
+    'layers' => 'Camadas',
+    'users' => 'Utilizadores',
+    'roles' => 'Funções',
+    'permissions' => 'Permissões',
+    'settings' => 'Configurações',
+    'dashboard' => 'Painel de Controlo',
+    'live-data' => 'Dados em Tempo Real',
+    'assets' => 'Ativos',
+    'alerts' => 'Alertas',
+    'history' => 'Histórico',
+    'simulations' => 'Simulações',
+    'analytics' => 'Análises',
+    'integrations' => 'Integrações',
+
 ];

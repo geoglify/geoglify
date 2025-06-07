@@ -45,4 +45,20 @@ return [
     'verification_link_sent' => 'Se ha enviado un nuevo enlace de verificación a la dirección de email proporcionada durante el registro.',
     'resend_verification_email' => 'Reenviar email de verificación',
     'log_out' => 'Cerrar sesión',
+
+    // Sidebar.vue
+    'map' => 'Mapa',
+    'layers' => 'Capas',
+    'users' => 'Usuarios',
+    'roles' => 'Roles',
+    'permissions' => 'Permisos',
+    'settings' => 'Configuración',
+    'dashboard' => 'Panel de Control',
+    'live-data' => 'Datos en Tiempo Real',
+    'assets' => 'Activos',
+    'alerts' => 'Alertas',
+    'history' => 'Historial',
+    'simulations' => 'Simulaciones',
+    'analytics' => 'Análisis',
+    'integrations' => 'Integraciones',
 ];

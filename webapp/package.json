@@ -25,9 +25,10 @@
         "vuetify": "^3.8.6"
     },
     "dependencies": {
+        "@iconify/vue": "^5.0.0-beta.3",
         "@inertiajs/vue3": "^2.0.11",
-        "@mdi/font": "^7.4.47",
         "@vitejs/plugin-vue": "^5.2.4",
+        "maplibre-gl": "^5.6.0",
         "vue": "^3.5.14",
         "vue-country-flag-next": "^2.3.2",
         "vue-i18n": "^11.1.5"

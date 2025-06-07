@@ -150,7 +150,21 @@
         "email_verification_instructions": "Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another.",
         "verification_link_sent": "A new verification link has been sent to the email address you provided during registration.",
         "resend_verification_email": "Resend Verification Email",
-        "log_out": "Log Out"
+        "log_out": "Log Out",
+        "map": "Map",
+        "layers": "Layers",
+        "users": "Users",
+        "roles": "Roles",
+        "permissions": "Permissions",
+        "settings": "Settings",
+        "dashboard": "Dashboard",
+        "live-data": "Live Data",
+        "assets": "Assets",
+        "alerts": "Alerts",
+        "history": "History",
+        "simulations": "Simulations",
+        "analytics": "Analytics",
+        "integrations": "Integrations"
     },
     "http-statuses": {
         "0": "Unknown Error",

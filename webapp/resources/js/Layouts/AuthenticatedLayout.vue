@@ -1,18 +1,37 @@
 <script setup>
-import { ref } from 'vue';
+import { ref } from 'vue'
+import AppHeader from '../Components/AppHeader.vue'
+import AppSidebar from '../Components/AppSidebar.vue'
+import AppMain from '../Components/AppMain.vue'
+import AppFooter from '../Components/AppFooter.vue'
+
+const sidebarOpen = ref(true)
+
+const toggleSidebar = () => {
+    sidebarOpen.value = !sidebarOpen.value
+}
 </script>
 
 <template>
-    <div class="bg-yellow min-h-screen flex items-center justify-center p-8">
+    <v-app>
 
-        <v-card class="mx-auto pa-8" elevation="0" width="448" rounded="xs">
+        <AppHeader @toggle-sidebar="toggleSidebar" />
+
+        <AppSidebar v-model="sidebarOpen" />
+
+        <AppMain>
             <slot />
-        </v-card>
+        </AppMain>
 
-        <div class="absolute bottom-2 w-full text-center px-8">
-            <p class="text-xs">
-                Powered by Geoglify v1.0.0 - {{ new Date().getFullYear() }}
-            </p>
-        </div>
-    </div>
+        <AppFooter />
+    </v-app>
 </template>
+
+<style>
+html,
+body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+}
+</style>

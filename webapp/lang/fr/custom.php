@@ -46,4 +46,20 @@ return [
     'resend_verification_email' => 'Renvoyer l\'email de vérification',
     'log_out' => 'Se déconnecter',
 
+    // Sidebar.vue
+    'map' => 'Carte',
+    'layers' => 'Couches',
+    'users' => 'Utilisateurs',
+    'roles' => 'Rôles',
+    'permissions' => 'Autorisations',
+    'settings' => 'Paramètres',
+    'dashboard' => 'Tableau de Bord',
+    'live-data' => 'Données en Temps Réel',
+    'assets' => 'Actifs',
+    'alerts' => 'Alertes',
+    'history' => 'Historique',
+    'simulations' => 'Simulations',
+    'analytics' => 'Analyses',
+    'integrations' => 'Intégrations',
+
 ];

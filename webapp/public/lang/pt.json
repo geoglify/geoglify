@@ -151,7 +151,21 @@
         "verification_link_sent": "Um novo link de verificação foi enviado para o endereço de email fornecido durante o registo.",
         "resend_verification_email": "Reenviar Email de Verificação",
         "log_out": "Terminar Sessão",
-        "delete_account": "Eliminar Conta"
+        "delete_account": "Eliminar Conta",
+        "map": "Mapa",
+        "layers": "Camadas",
+        "users": "Utilizadores",
+        "roles": "Funções",
+        "permissions": "Permissões",
+        "settings": "Configurações",
+        "dashboard": "Painel de Controlo",
+        "live-data": "Dados em Tempo Real",
+        "assets": "Ativos",
+        "alerts": "Alertas",
+        "history": "Histórico",
+        "simulations": "Simulações",
+        "analytics": "Análises",
+        "integrations": "Integrações"
     },
     "http-statuses": {
         "0": "Erro desconhecido",

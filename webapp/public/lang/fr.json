@@ -150,7 +150,21 @@
         "email_verification_instructions": "Merci de vous être inscrit ! Avant de commencer, pourriez-vous vérifier votre adresse email en cliquant sur le lien que nous venons de vous envoyer ? Si vous n'avez pas reçu l'email, nous serons ravis de vous en envoyer un autre.",
         "verification_link_sent": "Un nouveau lien de vérification a été envoyé à l'adresse email fournie lors de l'inscription.",
         "resend_verification_email": "Renvoyer l'email de vérification",
-        "log_out": "Se déconnecter"
+        "log_out": "Se déconnecter",
+        "map": "Carte",
+        "layers": "Couches",
+        "users": "Utilisateurs",
+        "roles": "Rôles",
+        "permissions": "Autorisations",
+        "settings": "Paramètres",
+        "dashboard": "Tableau de Bord",
+        "live-data": "Données en Temps Réel",
+        "assets": "Actifs",
+        "alerts": "Alertes",
+        "history": "Historique",
+        "simulations": "Simulations",
+        "analytics": "Analyses",
+        "integrations": "Intégrations"
     },
     "http-statuses": {
         "0": "Erreur inconnue",

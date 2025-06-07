@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import Map from '@/Components/Map.vue';
 import { Head } from '@inertiajs/vue3';
 </script>
 
@@ -8,13 +9,6 @@ import { Head } from '@inertiajs/vue3';
     <Head title="Dashboard" />
 
     <AuthenticatedLayout>
-
-        <form>
-
-            <div class="text-center text-h6">
-                Welcome <b>{{ $page.props.auth.user.name }}</b> to your dashboard!
-            </div>
-
-        </form>
+        <Map/>
     </AuthenticatedLayout>
 </template>

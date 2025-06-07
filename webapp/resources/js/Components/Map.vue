@@ -9,16 +9,18 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 const mapContainer = ref(null)
+const MAPTILER_KEY = "Qbwxcd8lf8BWDwAZyp5B";
 
 onMounted(() => {
     new maplibregl.Map({
-        container: 'map', // container id
-        style: 'https://demotiles.maplibre.org/style.json', // style URL
-        center: [0, 0], // starting position [lng, lat]
-        zoom: 1, // starting zoom
+        style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${MAPTILER_KEY}`,
+        center: [-8.639997955171657, 41.146846648292865],
+        zoom: 15.5,
+        pitch: 45,
+        bearing: -17.6,
+        container: 'map',
+        canvasContextAttributes: { antialias: true },
         container: mapContainer.value,
-        container: mapContainer.value,
-        canvasContextAttributes: { antialias: true }
     });
 })
 </script>
@@ -26,6 +28,6 @@ onMounted(() => {
 <style scoped>
 .map-container {
     width: 100%;
-    height: 100vh;
+    height: 100%;
 }
 </style>

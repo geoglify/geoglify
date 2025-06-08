@@ -2,15 +2,14 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+use App\Http\Controllers\MapController;
+
+//! To avoid the 503 error, ensure that the application is properly configured and running.
+//Route::get( '/', fn() => App::abort( 503 ) );
 
 Route::get('/', function () {
-    return redirect()->route('dashboard');
+    return redirect()->route('map.index');
 })->name('home');
-
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::post('/set-locale', function () {
     $locale = request('locale');
@@ -20,7 +19,12 @@ Route::post('/set-locale', function () {
     }
 })->name('locale.set');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
+
+    // Map
+    Route::get('/map', [MapController::class, 'index'])->name('map.index');
+
+    // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

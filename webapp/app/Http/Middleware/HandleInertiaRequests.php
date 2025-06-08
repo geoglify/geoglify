@@ -32,10 +32,15 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
 
+        if ($user) {
+            $user->load(['roles', 'permissions']);
+        }
+
         return [
             ...parent::share($request),
             'auth' => [
                 'user' => $user,
+                'role' => $user?->roles->pluck('name')->first(),
             ],
             'csrf_token' => $request->session()->token(),
             'locale' => app()->getLocale(),

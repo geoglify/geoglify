@@ -14,7 +14,7 @@ const menu = ref(false)
         <v-spacer></v-spacer>
 
         <v-list-item prepend-avatar="https://pbs.twimg.com/profile_images/1929263634816856064/I2ZtcV0K_400x400.jpg"
-            subtitle="Administrator" :title="$page.props.auth.user.name">
+            :title="$page.props.auth.user.name" :subtitle="$page.props.auth.role.toUpperCase()">
             <template v-slot:append>
                 <v-menu v-model="menu" location="bottom end">
                     <template v-slot:activator="{ props }">

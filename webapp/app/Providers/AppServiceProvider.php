@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Vite::prefetch(concurrency: 3);
 
-         Scramble::configure()->routes(function (Route $route) {
+        Scramble::configure()->routes(function (Route $route) {
             return Str::startsWith($route->uri, 'api/');
         });
     }

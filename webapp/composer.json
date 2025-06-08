@@ -17,6 +17,7 @@
         "laravel/reverb": "^1.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
+        "spatie/laravel-permission": "^6.19",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {

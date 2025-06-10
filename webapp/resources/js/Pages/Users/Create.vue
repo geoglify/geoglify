@@ -41,8 +41,8 @@ const createUser = () => {
         </template>
 
         <v-form @submit.prevent="createUser">
-            <v-card class="mx-auto pa-3" variant="flat" title="Create User" subtitle="Create a new user">
-                <v-card-text>
+            <v-card class="mx-auto" variant="flat" title="Create User">
+                <v-card-text class="pt-6">
 
                     <v-text-field v-model="form.name" label="Name" required variant="outlined"
                         :error-messages="form.errors.name" class="mb-4" />

@@ -41,9 +41,8 @@ const updateUser = () => {
         </template>
 
         <v-form @submit.prevent="updateUser">
-            <v-card class="mx-auto pa-3" variant="flat" title="Edit User" subtitle="Edit user details">
-                <v-card-text>
-
+            <v-card class="mx-auto" variant="flat" title="Edit User">
+                <v-card-text class="pt-6">
                     <v-text-field v-model="form.name" label="Name" required variant="outlined"
                         :error-messages="form.errors.name" :disabled="form.is_ldap" class="mb-4" />
 
@@ -60,8 +59,7 @@ const updateUser = () => {
                         :disabled="form.is_ldap" class="mb-4" />
 
                     <v-select v-model="form.role_id" label="Role" required variant="outlined" :items="props.roles"
-                        item-value="id" item-title="name" :error-messages="form.errors.role_id"
-                        class="mb-4"></v-select>
+                        item-value="id" item-title="name" :error-messages="form.errors.role_id" class="mb-4"></v-select>
 
                 </v-card-text>
                 <v-card-actions class="px-4">

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
@@ -34,6 +35,13 @@ return new class extends Migration
             $table->text('user_agent')->nullable();
             $table->longText('payload');
             $table->integer('last_activity')->index();
+        });
+
+        // Add foreign key constraint to users table
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null')->index('fk_users_created_by');
+            $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null')->index('fk_users_updated_by');
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->onDelete('set null')->index('fk_users_deleted_by');
         });
     }
 

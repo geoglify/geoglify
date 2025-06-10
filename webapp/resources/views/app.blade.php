@@ -14,10 +14,6 @@
     @routes
     @vite(['resources/js/app.js', 'resources/css/app.css'])
     @inertiaHead
-
-    <script>
-        window.__locale = '{{ $locale }}';
-    </script>
 </head>
 
 <body class="antialiased">

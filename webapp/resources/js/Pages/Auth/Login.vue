@@ -48,10 +48,7 @@ export default {
 
             <v-text-field v-model="form.email" density="compact" :placeholder="$t('custom.email_address')"
                 variant="outlined" required autofocus autocomplete="username" :error-messages="form.errors.email"
-                hide-details="auto">
-                <template v-slot:prepend-inner>
-                    <Icon icon="mdi:email-outline" style="font-size:24px;font-style:italic;height:24px;opacity:0.4" />
-                </template>
+                hide-details="auto" prepend-inner-icon="mdi:email-outline">
             </v-text-field>
 
             <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between mt-4">
@@ -64,16 +61,8 @@ export default {
 
             <v-text-field v-model="form.password" :type="showPassword ? 'text' : 'password'" density="compact"
                 :placeholder="$t('custom.enter_your_password')" variant="outlined" required
-                autocomplete="current-password" :error-messages="form.errors.password" hide-details="auto">
-                <template v-slot:prepend-inner>
-                    <Icon icon="mdi:lock-outline" style="font-size:24px;font-style:italic;height:24px;opacity:0.4" />
-                </template>
-                <template v-slot:append-inner>
-                    <Icon icon="mdi:eye" v-if="showPassword" style="font-size:24px;opacity:0.4;cursor:pointer"
-                        @click="showPassword = false" />
-                    <Icon icon="mdi:eye-off" v-else style="font-size:24px;opacity:0.4;cursor:pointer"
-                        @click="showPassword = true" />
-                </template>
+                autocomplete="current-password" :error-messages="form.errors.password" hide-details="auto" prepend-inner-icon="mdi:lock-outline" 
+                :append-inner-icon="showPassword ? 'mdi:eye' : 'mdi:eye-off'" @click:append-inner="showPassword = !showPassword">
             </v-text-field>
 
             <v-card class="mb-4 mt-4" color="surface-variant" variant="tonal">

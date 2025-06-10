@@ -39,17 +39,9 @@ export default {
             </div>
             <v-text-field v-model="form.password" :type="showPassword ? 'text' : 'password'" density="compact"
                 :placeholder="$t('custom.enter_password')" variant="outlined" required autofocus
-                autocomplete="current-password" :error-messages="form.errors.password" hide-details="auto">
-                <template v-slot:prepend-inner>
-                    <Icon icon="mdi:lock-outline" style="font-size:24px;font-style:italic;height:24px;opacity:0.4" />
-                </template>
-
-                <template v-slot:append-inner>
-                    <Icon icon="mdi:eye" v-if="showPassword" style="font-size:24px;opacity:0.4;cursor:pointer"
-                        @click="showPassword = false" />
-                    <Icon icon="mdi:eye-off" v-else style="font-size:24px;opacity:0.4;cursor:pointer"
-                        @click="showPassword = true" />
-                </template>
+                autocomplete="current-password" :error-messages="form.errors.password" hide-details="auto" 
+                prepend-icon="mdi:lock-outline" :append-icon="showPassword ? 'mdi:eye' : 'mdi:eye-off'"
+                @click:append="showPassword = !showPassword">
             </v-text-field>
 
 

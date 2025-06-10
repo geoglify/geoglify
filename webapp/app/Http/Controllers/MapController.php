@@ -10,7 +10,7 @@ class MapController extends Controller
 {
     public function index()
     {
-        $this->authorize('map.index');
+        //$this->authorize('map.index');
         return Inertia::render('Map/Index');
     }
 

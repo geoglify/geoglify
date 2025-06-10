@@ -31,9 +31,21 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $user = $request->user();
+        $can = [];
 
         if ($user) {
+
             $user->load(['roles', 'permissions']);
+
+            // Use the user's permissions
+            $permissions = $user->getAllPermissions()->map(function ($permission) {
+                return ['name' => $permission->name];
+            });
+
+            $can = $permissions->map(function ($permission) use ($user) {
+                return [$permission['name'] => $user->can($permission['name'])];
+            })->collapse()->all();
+            
         }
 
         return [
@@ -41,6 +53,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $user,
                 'role' => $user?->roles->pluck('name')->first(),
+                'can' => $can,
             ],
             'csrf_token' => $request->session()->token(),
             'locale' => app()->getLocale(),

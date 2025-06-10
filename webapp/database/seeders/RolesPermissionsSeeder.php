@@ -10,7 +10,7 @@ use App\Models\User;
 class RolesPermissionsSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Run the database seeds_
      */
     public function run(): void
     {
@@ -24,67 +24,67 @@ class RolesPermissionsSeeder extends Seeder
         // Define permissions for the application
         $permissions = [
             // Map permissions
-            'map.view',
-            'map.create',
-            'map.edit',
-            'map.delete',
+            'map_view',
+            'map_create',
+            'map_edit',
+            'map_delete',
 
             // Layers permissions
-            'layers.view',
-            'layers.create',
-            'layers.edit',
-            'layers.delete',
+            'layers_view',
+            'layers_create',
+            'layers_edit',
+            'layers_delete',
 
             // Assets permissions
-            'assets.view',
-            'assets.create',
-            'assets.edit',
-            'assets.delete',
+            'assets_view',
+            'assets_create',
+            'assets_edit',
+            'assets_delete',
 
             // Alerts permissions
-            'alerts.view',
-            'alerts.create',
-            'alerts.edit',
-            'alerts.delete',
-            'alerts.manage',
+            'alerts_view',
+            'alerts_create',
+            'alerts_edit',
+            'alerts_delete',
+            'alerts_manage',
 
             // History permissions
-            'history.view',
-            'history.export',
+            'history_view',
+            'history_export',
 
             // Simulations permissions
-            'simulations.view',
-            'simulations.create',
-            'simulations.edit',
-            'simulations.delete',
-            'simulations.run',
+            'simulations_view',
+            'simulations_create',
+            'simulations_edit',
+            'simulations_delete',
+            'simulations_run',
 
             // Analytics permissions
-            'analytics.view',
-            'analytics.export',
-            'analytics.advanced',
+            'analytics_view',
+            'analytics_export',
+            'analytics_advanced',
 
             // Integrations permissions
-            'integrations.view',
-            'integrations.create',
-            'integrations.edit',
-            'integrations.delete',
+            'integrations_view',
+            'integrations_create',
+            'integrations_edit',
+            'integrations_delete',
 
             // Users permissions
-            'users.view',
-            'users.create',
-            'users.edit',
-            'users.delete',
+            'users_view',
+            'users_create',
+            'users_edit',
+            'users_delete',
 
             // Permissions management
-            'permissions.view',
-            'permissions.assign',
-            'permissions.edit',
+            'permissions_view',
+            'permissions_assign',
+            'permissions_edit',
 
             // Settings permissions
-            'settings.view',
-            'settings.edit',
-            'settings.advanced',
+            'settings_view',
+            'settings_edit',
+            'settings_advanced',
         ];
 
         // Create permissions
@@ -102,60 +102,60 @@ class RolesPermissionsSeeder extends Seeder
 
         // Assign specific permissions to the admin and user roles
         $adminPermissions = [
-            'map.view',
-            'map.create',
-            'map.edit',
-            'map.delete',
-            'layers.view',
-            'layers.create',
-            'layers.edit',
-            'layers.delete',
-            'assets.view',
-            'assets.create',
-            'assets.edit',
-            'assets.delete',
-            'alerts.view',
-            'alerts.create',
-            'alerts.edit',
-            'alerts.delete',
-            'alerts.manage',
-            'history.view',
-            'history.export',
-            'simulations.view',
-            'simulations.create',
-            'simulations.edit',
-            'simulations.delete',
-            'simulations.run',
-            'analytics.view',
-            'analytics.export',
-            'analytics.advanced',
-            'integrations.view',
-            'integrations.create',
-            'integrations.edit',
-            'integrations.delete',
-            'users.view',
-            'users.create',
-            'users.edit',
-            'users.delete',
-            'permissions.view',
-            'permissions.assign',
-            'settings.view',
-            'settings.edit',
+            'map_view',
+            'map_create',
+            'map_edit',
+            'map_delete',
+            'layers_view',
+            'layers_create',
+            'layers_edit',
+            'layers_delete',
+            'assets_view',
+            'assets_create',
+            'assets_edit',
+            'assets_delete',
+            'alerts_view',
+            'alerts_create',
+            'alerts_edit',
+            'alerts_delete',
+            'alerts_manage',
+            'history_view',
+            'history_export',
+            'simulations_view',
+            'simulations_create',
+            'simulations_edit',
+            'simulations_delete',
+            'simulations_run',
+            'analytics_view',
+            'analytics_export',
+            'analytics_advanced',
+            'integrations_view',
+            'integrations_create',
+            'integrations_edit',
+            'integrations_delete',
+            'users_view',
+            'users_create',
+            'users_edit',
+            'users_delete',
+            'permissions_view',
+            'permissions_assign',
+            'settings_view',
+            'settings_edit',
         ];
         $adminRole->syncPermissions($adminPermissions);
 
         // Assign limited permissions to the user role
         $userPermissions = [
-            'map.view',
-            'layers.view',
-            'assets.view',
-            'alerts.view',
-            'history.view',
-            'simulations.view',
-            'simulations.run',
-            'analytics.view',
-            'integrations.view',
-            'settings.view',
+            'map_view',
+            'layers_view',
+            'assets_view',
+            'alerts_view',
+            'history_view',
+            'simulations_view',
+            'simulations_run',
+            'analytics_view',
+            'integrations_view',
+            'settings_view',
         ];
 
         $userRole->syncPermissions($userPermissions);
@@ -169,6 +169,6 @@ class RolesPermissionsSeeder extends Seeder
             $user->assignRole('user');
         }
 
-        $this->command->info('All users assigned to the root role.');
+        $this->command->info('All users assigned to the root role_');
     }
 }

@@ -20,6 +20,12 @@ const toggleSidebar = () => {
         <AppSidebar v-model="sidebarOpen" />
 
         <AppMain>
+
+            <v-system-bar class="px-0">
+                <slot name="breadcrumbs" />
+                <v-spacer></v-spacer>
+            </v-system-bar>
+
             <slot />
         </AppMain>
 

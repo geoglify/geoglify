@@ -5,15 +5,15 @@ import vuetify from "vite-plugin-vuetify";
 
 export default defineConfig({
     server: {
-        host: '0.0.0.0',
+        host: "0.0.0.0",
         hmr: {
             clientPort: 5173,
-            host: 'localhost',
+            host: "localhost",
         },
         watch: {
             usePolling: true,
-            interval: 1000
-        }
+            interval: 1000,
+        },
     },
     plugins: [
         laravel({

@@ -7,11 +7,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use App\Traits\HasUserAudit;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Session;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, HasUserAudit, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -22,6 +25,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'email_verified_at',
+        'created_by',
+        'updated_by',
+        'deleted_by',
     ];
 
     /**
@@ -45,5 +52,15 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get last session for the user.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\Session>
+     */
+    public function lastSession()
+    {
+        return $this->hasOne(Session::class)->orderBy('last_activity', 'desc');
     }
 }

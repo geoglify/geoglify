@@ -39,10 +39,8 @@ export default {
                 <span class="text-caption font-weight-bold">{{ $t('custom.name') }}</span>
             </div>
             <v-text-field v-model="form.name" density="compact" :placeholder="$t('custom.full_name')" variant="outlined"
-                required autofocus autocomplete="name" :error-messages="form.errors.name" hide-details="auto">
-                <template v-slot:prepend-inner>
-                    <Icon icon="mdi:account-outline" style="font-size:24px;font-style:italic;height:24px;opacity:0.4" />
-                </template>
+                required autofocus autocomplete="name" :error-messages="form.errors.name" hide-details="auto"
+                prepend-inner-icon="mdi-account-outline">
             </v-text-field>
 
             <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between mt-4">
@@ -50,10 +48,7 @@ export default {
             </div>
             <v-text-field v-model="form.email" density="compact" :placeholder="$t('custom.email_address')"
                 variant="outlined" required autocomplete="username" :error-messages="form.errors.email"
-                hide-details="auto">
-                <template v-slot:prepend-inner>
-                    <Icon icon="mdi:email-outline" style="font-size:24px;font-style:italic;height:24px;opacity:0.4" />
-                </template>
+                hide-details="auto" prepend-inner-icon="mdi:email-outline">
             </v-text-field>
 
             <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between mt-4">
@@ -61,16 +56,9 @@ export default {
             </div>
             <v-text-field v-model="form.password" :type="showPassword ? 'text' : 'password'" density="compact"
                 :placeholder="$t('custom.enter_your_password')" variant="outlined" required autocomplete="new-password"
-                :error-messages="form.errors.password" hide-details="auto">
-                <template v-slot:prepend-inner>
-                    <Icon icon="mdi:lock-outline" style="font-size:24px;font-style:italic;height:24px;opacity:0.4" />
-                </template>
-                <template v-slot:append-inner>
-                    <Icon icon="mdi:eye" v-if="showPassword" style="font-size:24px;opacity:0.4;cursor:pointer"
-                        @click="showPassword = false" />
-                    <Icon icon="mdi:eye-off" v-else style="font-size:24px;opacity:0.4;cursor:pointer"
-                        @click="showPassword = true" />
-                </template>
+                :error-messages="form.errors.password" hide-details="auto" prepend-inner-icon="mdi:lock-outline"
+                @click:append-inner="showPassword = !showPassword"
+                :append-inner-icon="showPassword ? 'mdi:eye' : 'mdi:eye-off'">
             </v-text-field>
 
             <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between mt-4">
@@ -78,17 +66,9 @@ export default {
             </div>
             <v-text-field v-model="form.password_confirmation" :type="showPasswordConfirmation ? 'text' : 'password'"
                 density="compact" :placeholder="$t('custom.confirm_your_password')" variant="outlined" required
-                autocomplete="new-password" :error-messages="form.errors.password_confirmation" hide-details="auto">
-                <template v-slot:append-inner>
-                    <Icon icon="mdi:eye" v-if="showPasswordConfirmation"
-                        style="font-size:24px;opacity:0.4;cursor:pointer" @click="showPasswordConfirmation = false" />
-                    <Icon icon="mdi:eye-off" v-else style="font-size:24px;opacity:0.4;cursor:pointer"
-                        @click="showPasswordConfirmation = true" />
-                </template>
-                <template v-slot:prepend-inner>
-                    <Icon icon="mdi:lock-check-outline"
-                        style="font-size:24px;font-style:italic;height:24px;opacity:0.4" />
-                </template>
+                autocomplete="new-password" :error-messages="form.errors.password_confirmation" hide-details="auto" 
+                prepend-inner-icon="mdi:lock-outline" @click:append-inner="showPasswordConfirmation = !showPasswordConfirmation"
+                :append-inner-icon="showPasswordConfirmation ? 'mdi:eye' : 'mdi:eye-off'">
             </v-text-field>
 
             <v-btn :class="{ 'opacity-25': form.processing }" :readonly="form.processing" @click.prevent="submit"

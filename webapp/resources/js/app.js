@@ -13,6 +13,7 @@ import { ZiggyVue } from "../../vendor/tightenco/ziggy";
 // Vuetify
 import "vuetify/styles";
 import { createVuetify } from "vuetify";
+import { VTreeview } from "vuetify/labs/VTreeview";
 
 // Laravel Echo (real-time events)
 import "./echo";
@@ -59,6 +60,9 @@ const vuetify = createVuetify({
             },
         },
     },
+    components: {
+        VTreeview,
+    },
 });
 
 // Create the Inertia app
@@ -87,7 +91,8 @@ createInertiaApp({
             // Register global date formatting functions
             app.config.globalProperties.$formatDate = formatDate;
             app.config.globalProperties.$formatDateTime = formatDateTime;
-            app.config.globalProperties.$formatDateTimeSeconds = formatDateTimeSeconds;
+            app.config.globalProperties.$formatDateTimeSeconds =
+                formatDateTimeSeconds;
 
             // Mount the application
             app.mount(el);

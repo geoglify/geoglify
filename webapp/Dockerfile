@@ -24,7 +24,8 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libgd-dev \
     nodejs \
-    npm 
+    npm \
+    cron
 
 # Install Postgre PDO
 RUN apt-get install -y libpq-dev \
@@ -45,6 +46,12 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 # Copy existing application directory contents
 COPY . /var/www
+
+# Create a log file
+RUN touch /var/log/cron.log
+
+# Add cron job directly to crontab
+RUN echo "* * * * * /usr/local/bin/php /var/www/artisan schedule:run >> /var/log/cron.log 2>&1" | crontab -
 
 # Set permissions entrypoint script and supervisor config
 RUN chmod +x /var/www/entrypoint.sh

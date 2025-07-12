@@ -1,8 +1,13 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+Schedule::command('dosomething A --duration=15 --worker_id=2')->everyFiveSeconds()->runInBackground()->withoutOverlapping();
+
+Schedule::command('dosomething B --duration=15 --worker_id=2')->everyFiveSeconds()->runInBackground()->withoutOverlapping();
+
+Schedule::command('dosomething C --duration=15 --worker_id=2')->everyFiveSeconds()->runInBackground()->withoutOverlapping();
+
+Schedule::command('dosomething D --duration=15 --worker_id=2')->everyFiveSeconds()->runInBackground()->withoutOverlapping();
+
+Schedule::command('dosomething E --duration=15 --worker_id=2')->everyFiveSeconds()->runInBackground()->withoutOverlapping();

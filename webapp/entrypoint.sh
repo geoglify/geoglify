@@ -36,6 +36,8 @@ if [ "$APP_ENV" = "production" ]; then
     npm run build
 fi
 
+service cron start
+
 # Start Supervisord to manage processes
 echo "Supervisord started."
 exec /usr/bin/supervisord -c /etc/supervisord.conf

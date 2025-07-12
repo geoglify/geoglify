@@ -48,7 +48,7 @@ const props = defineProps({
 // Emits
 const emit = defineEmits(['update:modelValue'])
 
-// Computed navigation items with permissions
+// Navigation items
 const navigationItems = computed(() => [
     {
         icon: 'material-symbols-light:map-outline',
@@ -61,42 +61,6 @@ const navigationItems = computed(() => [
         title: 'custom.layers',
         value: 'layers.index',
         disabled: !$page.props.auth?.can?.layers_view
-    },
-    {
-        icon: 'mdi-light:map-marker',
-        title: 'custom.assets',
-        value: 'assets.index',
-        disabled: !$page.props.auth?.can?.assets_view
-    },
-    {
-        icon: 'material-symbols-light:crisis-alert',
-        title: 'custom.alerts',
-        value: 'alerts.index',
-        disabled: !$page.props.auth?.can?.alerts_view
-    },
-    {
-        icon: 'material-symbols-light:manage-history',
-        title: 'custom.history',
-        value: 'history.index',
-        disabled: !$page.props.auth?.can?.history_view
-    },
-    {
-        icon: 'material-symbols-light:simulation-outline',
-        title: 'custom.simulations',
-        value: 'simulations.index',
-        disabled: !$page.props.auth?.can?.simulations_view
-    },
-    {
-        icon: 'material-symbols-light:analytics-outline',
-        title: 'custom.analytics',
-        value: 'analytics.index',
-        disabled: !$page.props.auth?.can?.analytics_view
-    },
-    {
-        icon: 'material-symbols-light:integration-instructions-outline',
-        title: 'custom.integrations',
-        value: 'integrations.index',
-        disabled: !$page.props.auth?.can?.integrations_view
     },
     {
         icon: 'material-symbols-light:supervisor-account-outline',
@@ -118,12 +82,12 @@ const navigationItems = computed(() => [
     }
 ])
 
-// Check if route is active
+// Check if the current route is active
 function isActiveRoute(routeName) {
     return $page.component.startsWith(routeName.replace('.index', '').charAt(0).toUpperCase() + routeName.replace('.index', '').slice(1))
 }
 
-// Navigate to route
+// GoTo the specified route
 function navigateTo(item) {
     if (!item.disabled) {
         router.visit(route(item.value))
@@ -132,7 +96,6 @@ function navigateTo(item) {
 </script>
 
 <style scoped>
-/* Additional styling if needed */
 .v-list-item--disabled {
     pointer-events: none;
 }
@@ -141,23 +104,19 @@ function navigateTo(item) {
     opacity: 0.6;
 }
 
-/* Custom styling for the navigation drawer */
 .v-navigation-drawer {
     border-right: 1px solid rgba(0, 0, 0, 0.12);
 }
 
-/* Active item styling */
 .v-list-item--active {
     background-color: rgba(var(--v-theme-primary), 0.1);
 }
 
-/* Icon hover effects */
 .v-list-item:not(.v-list-item--disabled):hover .v-icon {
     transform: scale(1.1);
     transition: transform 0.2s ease;
 }
 
-/* Hover effect for non-active items */
 .v-list-item:not(.v-list-item--disabled):not(.v-list-item--active):hover {
     background-color: rgba(0, 0, 0, 0.04);
 }

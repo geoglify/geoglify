@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\LayerController;
 
 //! To avoid the 503 error, ensure that the application is properly configured and running.
 //Route::get( '/', fn() => App::abort( 503 ) );
@@ -39,6 +40,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Layer Management
+    Route::post('/layers/list', [LayerController::class, 'list'])->name('layers.list');
+    Route::post('/layers/{id}/toggle-visibility', [LayerController::class, 'toggleVisibility'])->name('layers.toggle-visibility');
 });
 
 require __DIR__ . '/auth.php';

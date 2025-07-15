@@ -109,30 +109,18 @@ class AntennaClient {
   }
 
   queueEvent(event) {
+    // Check if MMSI is valid
     if (!event.mmsi) {
-      return; // MMSI é sempre obrigatório
+      return;
     }
 
-    // Adiciona timestamp se não existir
+    // Set timestamp if not provided
     if (!event.timestamp) {
       event.timestamp = new Date().toISOString();
     }
 
-    // Para posições com coordenadas, substitui evento existente do mesmo MMSI
-    if (event.latitude && event.longitude) {
-      const existingIndex = this.eventQueue.findIndex(
-        (e) => e.mmsi === event.mmsi
-      );
-
-      if (existingIndex !== -1) {
-        this.eventQueue[existingIndex] = event;
-      } else {
-        this.eventQueue.push(event);
-      }
-    } else {
-      // Para outros dados (sem coordenadas), sempre adiciona
-      this.eventQueue.push(event);
-    }
+    // Add event to the queue
+    this.eventQueue.push(event);
   }
 
   handleSocketClose() {
@@ -194,7 +182,7 @@ class AntennaClient {
   }
 
   registerConnectionEvents() {
-    // Remove todos os listeners existentes antes de adicionar novos
+    // Remove all previous listeners to avoid duplicates
     this.client.removeAllListeners();
 
     this.client.on("connect", this.handleSocketConnect.bind(this));

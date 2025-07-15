@@ -23,6 +23,9 @@ return new class extends Migration
             // Ship name - default to 'Unknown' if not provided
             $table->string('name')->nullable()->default('Unknown');
 
+            // Radio call sign
+            $table->string('call_sign')->nullable();
+
             // AIS type - identifies the type of ship (e.g., cargo, tanker, etc.)
             $table->integer('ais_type')->nullable();
 

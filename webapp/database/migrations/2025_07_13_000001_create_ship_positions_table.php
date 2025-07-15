@@ -25,9 +25,12 @@ return new class extends Migration
             // Ship name at the time of position report (may differ from current name)
             $table->string('name')->nullable()->default('Unknown');
 
+            // Radio call sign at the time of position report
+            $table->string('call_sign')->nullable();
+
             // Geospatial location (WGS 84)
-            $table->decimal('latitude', 10, 7);
-            $table->decimal('longitude', 10, 7);
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
 
             // Course Over Ground, Speed Over Ground, Heading
             $table->decimal('cog', 5, 1)->nullable(); // in degrees
@@ -77,6 +80,21 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
+
+        // Create trigger to calculate geometry from latitude and longitude if latitude and longitude are set
+        // This will automatically populate the geometry column when a new record is inserted
+        DB::unprepared('
+            CREATE OR REPLACE FUNCTION update_ship_position_geometry()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                IF NEW.latitude IS NOT NULL AND NEW.longitude IS NOT NULL THEN
+                    NEW.geometry := ST_SetSRID(ST_MakePoint(NEW.longitude, NEW.latitude), 4326);
+                ELSE
+                    NEW.geometry := NULL;
+                END IF;
+                RETURN NEW;
+            END;
+        ');
 
         // PostGIS index for spatial queries (GIST index)
         DB::statement('CREATE INDEX ship_positions_geometry_idx ON ship_positions USING GIST (geometry)');

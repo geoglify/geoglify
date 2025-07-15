@@ -18,10 +18,15 @@ class ShipPosition extends Model
         'sog',
         'heading',
         'nav_status',
+        'rot',
+        'repeat',
+        'channel',
+        'utc',
+        'smi',
         'timestamp',
         'geometry',
-        'geojson',
-        'properties',
+        'destination',
+        'draught',
         'created_by',
         'updated_by',
     ];
@@ -33,8 +38,11 @@ class ShipPosition extends Model
         'sog' => 'decimal:1',
         'heading' => 'integer',
         'nav_status' => 'integer',
+        'rot' => 'decimal:3',
+        'repeat' => 'integer',
+        'utc' => 'integer',
         'timestamp' => 'datetime',
-        'properties' => 'array',
+        'draught' => 'decimal:2',
     ];
 
     // ...existing code...

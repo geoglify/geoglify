@@ -23,18 +23,14 @@ class ShipAisController extends Controller
             'positions.*.sog' => 'nullable|numeric',
             'positions.*.heading' => 'nullable|integer',
             'positions.*.nav_status' => 'nullable|integer',
-            'positions.*.imo' => 'nullable|integer',
-            'positions.*.name' => 'nullable|string',
-            'positions.*.call_sign' => 'nullable|string',
-            'positions.*.ship_type' => 'nullable|integer',
-            'positions.*.dim_a' => 'nullable|integer',
-            'positions.*.dim_b' => 'nullable|integer',
-            'positions.*.dim_c' => 'nullable|integer',
-            'positions.*.dim_d' => 'nullable|integer',
-            'positions.*.properties' => 'nullable|array',
+            'positions.*.rot' => 'nullable|numeric',
+            'positions.*.repeat' => 'nullable|integer',
+            'positions.*.channel' => 'nullable|string',
+            'positions.*.utc' => 'nullable|integer',
+            'positions.*.smi' => 'nullable|string',
         ]);
 
-        // Despacha o job para processamento assíncrono
+        // Dispatch the job to process the AIS positions
         ProcessShipAisPositions::dispatch($data['positions']);
 
         return response()->json(['status' => 'accepted', 'count' => count($data['positions'])], 202);

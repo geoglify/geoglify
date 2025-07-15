@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\LayerController;
 use App\Http\Controllers\Api\FeatureController;
 use App\Http\Controllers\Api\ShipAisController;
-use App\Http\Controllers\Api\ShipInfoController;
 
 Route::prefix('v1')->group(function () {
     Route::get('/layers', [LayerController::class, 'index'])->name('api.layers.index');
@@ -23,5 +22,4 @@ Route::prefix('v1')->group(function () {
 
     // Ship AIS endpoints
     Route::post('/ship-ais', [ShipAisController::class, 'store'])->name('api.ship-ais.store');
-    Route::post('/ship-info', [ShipInfoController::class, 'store'])->name('api.ship-info.store');
 });

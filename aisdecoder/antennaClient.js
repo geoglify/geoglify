@@ -113,63 +113,26 @@ class AntennaClient {
       return; // MMSI é sempre obrigatório
     }
 
-    // Eventos de posição (com coordenadas) - para ship_positions
+    // Adiciona timestamp se não existir
+    if (!event.timestamp) {
+      event.timestamp = new Date().toISOString();
+    }
+
+    // Para posições com coordenadas, substitui evento existente do mesmo MMSI
     if (event.latitude && event.longitude) {
-      this.queuePositionEvent(event);
-    }
+      const existingIndex = this.eventQueue.findIndex(
+        (e) => e.mmsi === event.mmsi
+      );
 
-    // Eventos de informação (sem coordenadas, mas com outros dados úteis) - para ship_info
-    if (this.hasRelevantShipInfo(event)) {
-      this.queueInfoEvent(event);
-    }
-  }
-
-  queuePositionEvent(event) {
-    const existingIndex = this.eventQueue.findIndex(
-      (e) => e.mmsi === event.mmsi && e.type === "position"
-    );
-
-    const positionEvent = {
-      ...event,
-      type: "position",
-      timestamp: new Date().toISOString(),
-    };
-
-    if (existingIndex !== -1) {
-      this.eventQueue[existingIndex] = positionEvent;
+      if (existingIndex !== -1) {
+        this.eventQueue[existingIndex] = event;
+      } else {
+        this.eventQueue.push(event);
+      }
     } else {
-      this.eventQueue.push(positionEvent);
+      // Para outros dados (sem coordenadas), sempre adiciona
+      this.eventQueue.push(event);
     }
-  }
-
-  queueInfoEvent(event) {
-    // Para info, sempre adiciona novo registro (não sobrescreve)
-    const infoEvent = {
-      ...event,
-      type: "info",
-      timestamp: new Date().toISOString(),
-    };
-
-    this.eventQueue.push(infoEvent);
-  }
-
-  hasRelevantShipInfo(event) {
-    // Verifica se tem dados informativos relevantes
-    return !!(
-      event.name ||
-      event.imo ||
-      event.call_sign ||
-      event.destination ||
-      event.draught ||
-      event.cargo ||
-      event.ais_type ||
-      event.dim_a ||
-      event.dim_b ||
-      event.dim_c ||
-      event.dim_d ||
-      event.length ||
-      event.width
-    );
   }
 
   handleSocketClose() {

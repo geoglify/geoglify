@@ -44,16 +44,6 @@ class Ship extends Model
         return $this->hasMany(ShipPosition::class);
     }
 
-    public function shipInfo()
-    {
-        return $this->hasMany(ShipInfo::class);
-    }
-
-    public function latestInfo()
-    {
-        return $this->hasOne(ShipInfo::class)->latest('timestamp');
-    }
-
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
